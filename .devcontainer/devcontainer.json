@@ -1,0 +1,10 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile",
+        "target": "dev-env"
+    },
+    "extensions": [
+        "ms-python.python"
+    ],
+    "remoteUser": "developer"
+}
