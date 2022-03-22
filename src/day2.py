@@ -4,6 +4,7 @@ More details of the challenge can be found here:
 https://adventofcode.com/2021/day/2
 """
 from enum import Enum
+from fileinput import close
 import sys
 COMMANDS_FILE = "/workspaces/advent2021/src/day2.txt"
 
@@ -47,7 +48,7 @@ def getCommandList(file):
         inFile = open(file, 'r')
     except OSError:
         print("Could not open file")
-        sys.exit()
+        raise FileNotFoundError
 
     lines = inFile.readlines()
 
@@ -74,18 +75,22 @@ def getCommandList(file):
             commands.append(command)
     except UnknownCommandTypeError:
         print("Received an unknown command type")
-        sys.exit()     
+        raise UnknownCommandTypeError
+    finally:
+        inFile.close()    
     
     return commands
 
 class day2:
     """
     Models the behaviour for Day 2 of the Advent Calender 2021.
-    Maintains two parameters position and depth, and exposes all the API's needed to modify them.
+    Maintains three parameters position, depth and aim that are used to steer the submarine,
+    and exposes all the API's needed to modify them.
     """
-    def __init__(self, position, depth):
+    def __init__(self, position, depth, aim):
         self.position = position
         self.depth = depth
+        self.aim = aim
     
     def getPosition(self):
         return self.position
@@ -93,14 +98,20 @@ class day2:
     def getDepth(self):
         return self.depth
     
+    def getAim(self):
+        return self.aim
+    
     def modifyPosition(self, position):
         self.position += position
     
-    def modifyDepth(self, commandType, depth):
+    def modifyDepth(self, value):
+        self.depth += (self.aim * value)
+    
+    def modifyAim(self, commandType, aim):
         if commandType == CommandType.down:
-            self.depth += depth
+            self.aim += aim
         else:
-            self.depth -= depth
+            self.aim -= aim
     
     def getFinalResult(self):
         return (self.position * self.depth)
@@ -109,12 +120,13 @@ class day2:
         for command in commandList:
             if command.type == CommandType.forward:
                 self.modifyPosition(command.value)
+                self.modifyDepth(command.value)
             else:
-                self.modifyDepth(command.type, command.value)
+                self.modifyAim(command.type, command.value)
 
 def main():
     commands = getCommandList(COMMANDS_FILE)
-    day = day2(0, 0)
+    day = day2(0, 0, 0)
     day.executeCommands(commands)
     result = day.getFinalResult()
     print("Final Result is {}".format(result))
