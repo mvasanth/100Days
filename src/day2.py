@@ -4,8 +4,6 @@ More details of the challenge can be found here:
 https://adventofcode.com/2021/day/2
 """
 from enum import Enum
-from fileinput import close
-import sys
 COMMANDS_FILE = "/workspaces/advent2021/src/day2.txt"
 
 class CommandType(Enum):
