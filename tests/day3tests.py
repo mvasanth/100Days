@@ -5,7 +5,8 @@ import day3
 
 class testCommand(unittest.TestCase):
     def testGetDigitStringList(self):
-        digitStringList = day3.getDigitStringList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        digitStringList = day3.getDigitStringList(binaryStrings)
         self.assertIsNotNone(digitStringList)
         self.assertEqual(5, len(digitStringList))
         self.assertEqual('011110011100', digitStringList[0])
@@ -15,13 +16,15 @@ class testCommand(unittest.TestCase):
         self.assertEqual('000111100100', digitStringList[4])
     
     def testGetDigitStringListInvalidFile(self):
+        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
         try:
-            digitStringList = day3.getDigitStringList("/workspaces/advent2021/tests/day3tests.txt")
+            digitStringList = day3.getDigitStringList(binaryStrings)
         except:
             self.assertRaises(FileNotFoundError)
 
     def testGetGammaBinary(self):
-        digitStringList = day3.getDigitStringList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        digitStringList = day3.getDigitStringList(binaryStrings)
         gammaBin = day3.getGammaBinary(digitStringList)
         self.assertEqual('10110', gammaBin)
     
