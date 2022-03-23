@@ -7,6 +7,9 @@ https://adventofcode.com/2021/day/3
 COMMANDS_FILE = "/workspaces/advent2021/src/day3.txt"
 
 def getDigitStringList(file):
+    """
+    Given a list of binary numbers
+    """
     try:
         inFile = open(file, 'r')
     except OSError:
@@ -65,20 +68,102 @@ def getEpsilonBinary(gammaBin):
     return epsilonBin
 
 def getBinaryToDecimal(binary):
-    pass
+    return int(binary, 2)
 
-def getGammaDecimal(gammaBin):
-    return getBinaryToDecimal(gammaBin)
+def getBinaryStringsList(file):
+    """
+    Given a list of binary numbers
+    """
+    try:
+        inFile = open(file, 'r')
+    except OSError:
+        print("Could not open file")
+        raise FileNotFoundError
 
-def getEpsilonDecimal(epsilonBin):
-    return getBinaryToDecimal(epsilonBin)
+    lines = inFile.readlines()
 
-def getPowerConsumption(gamma, epsilon):
-    return (gamma * epsilon)
+    # strip the trailing newline at the end of each line
+    lines = [line.strip() for line in lines]
+
+    inFile.close()
+
+    return lines
+
+def getPrunedBinaryList(binList, digitPos, digit):
+    binListCopy = binList[:]
+
+    for binStr in binList:
+        if binStr[digitPos] != digit:
+            binListCopy.remove(binStr)
+    
+    return binListCopy
+
+def getZeroAndOneCountForPos(binList, digitPos):
+    countZero = 0
+    countOne = 0
+
+    for binStr in binList:
+        if binStr[digitPos] == '0':
+            countZero += 1
+        else:
+            countOne += 1
+    
+    return (countZero, countOne)
+
+def getOxygenGeneratorRatingBinary(binList):
+    # keep track of the digit pos
+    digitPos = 0
+
+    while (len(binList) != 1):
+        (countZero, countOne) = getZeroAndOneCountForPos(binList, digitPos)
+
+        if countZero > countOne:
+            binList = getPrunedBinaryList(binList, digitPos, '0')
+        else:
+            binList = getPrunedBinaryList(binList, digitPos, '1')
+        
+        digitPos += 1
+    
+    # list has a single element, the oxygen generator rating
+    return binList[0]
+
+def getCO2ScrubberRatingBinary(binList):
+    # keep track of the digit pos
+    digitPos = 0
+
+    while (len(binList) != 1):
+        (countZero, countOne) = getZeroAndOneCountForPos(binList, digitPos)
+
+        if countZero <= countOne:
+            binList = getPrunedBinaryList(binList, digitPos, '0')
+        else:
+            binList = getPrunedBinaryList(binList, digitPos, '1')
+        
+        digitPos += 1
+    
+    # list has a single element, the co2 scrubber rating
+    return binList[0]
 
 def main():
-    lines = getDigitStringList(COMMANDS_FILE)
-    pass
+    # PART 1
+    digitStringList = getDigitStringList(COMMANDS_FILE)
+    gammaBin = getGammaBinary(digitStringList)
+    epsilonBin = getEpsilonBinary(gammaBin)
+    
+    gamma = getBinaryToDecimal(gammaBin)
+    epsilon = getBinaryToDecimal(epsilonBin)
+    powerConsumption = gamma * epsilon
+    print("Power Consumption is {}".format(powerConsumption))
+
+    # PART 2
+    binaryStrings = getBinaryStringsList(COMMANDS_FILE)
+    oxygenGeneratorRatingBin = getOxygenGeneratorRatingBinary(binaryStrings)
+    co2ScrubberRatingBin = getCO2ScrubberRatingBinary(binaryStrings)
+
+    oxygenGeneratorRating = getBinaryToDecimal(oxygenGeneratorRatingBin)
+    co2ScrubberRating = getBinaryToDecimal(co2ScrubberRatingBin)
+    lifeSupportRating = oxygenGeneratorRating * co2ScrubberRating
+    print("Life Support Rating is {}".format(lifeSupportRating))
 
 if __name__ == '__main__':
     main()
