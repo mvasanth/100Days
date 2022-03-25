@@ -93,15 +93,15 @@ class Board:
 
         for square in self.grid:
             if not square.marked:
-                score += int(square.num)
+                score += square.num
         
-        score *= int(num)
+        score *= num
 
         return score
     
     def markSquare(self, num):
         for square in self.grid:
-            if num == square.num:
+            if num == square.getNum():
                 square.setMarked(True)
 
 class Bingo:
@@ -219,6 +219,7 @@ def getBingoBoardFromRawGrid(rawGrid):
     return board
 
 def main():
+    # Setup
     nums = getNumList(INPUT_NUMBERS)
     lines = getListOfLines(BINGO_BOARDS)
     rawGrids = getRawGrids(lines)
@@ -227,6 +228,7 @@ def main():
     bingo = Bingo(boards, nums)
     (board, score) = bingo.playGame()
 
+    # PART 1: Find the first board that wins the game and it's score
     if board == None and score == None:
         print("No winning board")
     else:
@@ -236,6 +238,7 @@ def main():
             print(square.getNum(), end=" ")
         print("\n")
 
+    # PART 2: Find the last board that wins the game and it's score
     (lastboard, lastscore) = bingo.playGameLastWins()
     print("Last winning board score: {}".format(lastscore))
     print("The board has: ")
