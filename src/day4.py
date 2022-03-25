@@ -13,51 +13,69 @@ COLUMNS: Final = 5
 class Square:
     """
     Models one square in a Bingo Board game.
-    Each square has a row, a column, the value and a flag to indicate if the number has already
+    Each square has the value and a flag to indicate if the number has already
     been seen in the game so far.
     """
-    def __init__(self, num, row, column, marked):
+    def __init__(self, num, marked):
         self.num = num
-        self.row = row
-        self.column = column
         self.marked = marked
     
     def getNum(self):
         return self.num
     
-    def getRow(self):
-        return self.row
-    
-    def getColumn(self):
-        return self.column
-    
     def getMarked(self):
         return self.marked
+    
+    def setMarked(self, marked):
+        self.marked = marked
 
 class Board:
     def __init__(self, grid):
         self.grid = grid
+        self.isCompleted = False
+    
+    def getIsCompleted(self):
+        return self.isCompleted
+    
+    def setIsCompleted(self, isCompleted):
+        self.isCompleted = isCompleted
 
     def mark(self, num):
         for square in self.grid:
             if square.num == num:
-                square.marked = True
+                square.setMarked(True)
 
     def isRowMarked(self):
-        for row in range(ROWS):
-            if self.grid[row].marked == False:
-                return False
-        
-        return True
+        for i in range(0, ROWS * COLUMNS, 5):
+            count = 0
+            for j in range(i, ROWS * COLUMNS):
+                if self.grid[j].getMarked() == True:
+                    count += 1
+                else:
+                    # found one that isn't marked, skip this row
+                    break
+                
+                if count == ROWS:
+                    return True
+            
+        return False
 
     def isColumnMarked(self):
-        for column in range(COLUMNS):
-            if self.grid[column].marked == False:
-                return False
-        
-        return True
+        for i in range(0, ROWS):
+            count = 0
+            for j in range(i, ROWS * COLUMNS, 5):
+                if self.grid[j].getMarked() == True:
+                    count += 1
+                else:
+                    # found one that isn't marked, skip this column
+                    break
+                
+                if count == COLUMNS:
+                    return True
+            
+        return False
 
-    def isMarked(self):
+    def isComplete(self):
         if self.isRowMarked() or self.isColumnMarked():
             return True
         
@@ -80,13 +98,48 @@ class Board:
         score *= int(num)
 
         return score
+    
+    def markSquare(self, num):
+        for square in self.grid:
+            if num == square.num:
+                square.setMarked(True)
 
 class Bingo:
-    def __init__(self, boards):
+    def __init__(self, boards, nums):
         self.boards = boards
+        self.nums = nums
     
     def playGame(self):
-        pass
+        for num in self.nums:
+            for board in self.boards:
+                # mark this number on each board
+                board.markSquare(num)
+
+                # this board has won the game! 
+                if board.isComplete() == True:
+                    score = board.getScore(num)
+                    return (board, score)
+        
+        # there was no winning board
+        return (None, None)
+    
+    def playGameLastWins(self):
+        for num in self.nums:
+            for board in self.boards:
+                # mark this number on each board
+                board.markSquare(num)
+
+                if board.getIsCompleted() == True:
+                    # move on, we want to find that last board that wins the game
+                    continue
+                elif board.isComplete() == True: 
+                    score = board.getScore(num)
+                    board.setIsCompleted(True)
+                    lastScore = score
+                    lastBoard = board
+        
+        # there was no winning board
+        return (lastBoard, lastScore)    
 
 def getNumList(file):
     """
@@ -104,15 +157,91 @@ def getNumList(file):
 
     inFile.close()
 
+    nums = [int(num) for num in nums]
     return nums
+
+def getListOfLines(file):
+    try:
+        inFile = open(file, 'r')
+    except OSError:
+        print("Could not open file")
+        raise FileNotFoundError
+
+    lines = inFile.readlines()
+
+    # strip the trailing newline at the end of each line
+    lines = [line.strip() for line in lines]
+
+    inFile.close()
+
+    return lines
+
+def getRawGrids(lines):
+    rawGrids = []
+    rawGrid = []
+
+    for line in lines:
+        if line == '':
+            # end of one grid
+            rawGrids.append(rawGrid)
+            # reset 
+            rawGrid = []
+        else:
+            rawNums = line.split(" ")
+            nums = rawNums[:]
+            for num in rawNums:
+                if num == '':
+                    nums.remove(num)
+                else:
+                    rawGrid.append(int(num))
+    
+    # append the last raw grid to the list
+    rawGrids.append(rawGrid)
+    return rawGrids
+
+def getBingoBoardsFromRawGrids(rawGrids):
+    boards = []
+
+    for rawGrid in rawGrids:
+        board = getBingoBoardFromRawGrid(rawGrid)
+        boards.append(board)
+    
+    return boards
+
+def getBingoBoardFromRawGrid(rawGrid):
+    grid = []
+
+    for i in range(ROWS * COLUMNS):
+        square = Square(rawGrid[i], False)
+        grid.append(square)
+    
+    board = Board(grid)
+    return board
 
 def main():
     nums = getNumList(INPUT_NUMBERS)
+    lines = getListOfLines(BINGO_BOARDS)
+    rawGrids = getRawGrids(lines)
+    boards = getBingoBoardsFromRawGrids(rawGrids)
+
+    bingo = Bingo(boards, nums)
+    (board, score) = bingo.playGame()
+
+    if board == None and score == None:
+        print("No winning board")
+    else:
+        print("Winning board score: {}".format(score))
+        print("The board has: ")
+        for square in board.grid:
+            print(square.getNum(), end=" ")
+        print("\n")
+
+    (lastboard, lastscore) = bingo.playGameLastWins()
+    print("Last winning board score: {}".format(lastscore))
+    print("The board has: ")
+    for square in lastboard.grid:
+        print(square.getNum(), end=" ")
+    print("\n")
 
 if __name__ == '__main__':
     main()
-
-class Day4:
-    def __init__(self, boards):
-        self.boards = boards
-    
