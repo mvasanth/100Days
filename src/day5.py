@@ -56,8 +56,8 @@ class Grid:
         """
         count = 0
 
-        for coordinate in self.coordinateDict:
-            if self.coordinateDict[coordinate] >= OVERLAPPED_LINES:
+        for count in self.coordinateDict.values():
+            if count >= OVERLAPPED_LINES:
                 count += 1
         
         return count
@@ -114,12 +114,12 @@ class Input:
             elements = line.split(" ")
 
             rawCoordinateOne = elements[0].split(",")
-            coordinateOne = Coordinate(int(rawCoordinateOne[0]), int(rawCoordinateOne[1]))
+            left = Coordinate(int(rawCoordinateOne[0]), int(rawCoordinateOne[1]))
 
             rawCoordinateTwo = elements[2].split(",")
-            coordinateTwo = Coordinate(int(rawCoordinateTwo[0]), int(rawCoordinateTwo[1]))
+            right = Coordinate(int(rawCoordinateTwo[0]), int(rawCoordinateTwo[1]))
 
-            return (coordinateOne, coordinateTwo)
+            return (left, right)
         
         except ValueError:
             raise MalformedLineError
@@ -146,40 +146,54 @@ class Input:
                 coordinate = Coordinate(coordinateOne.getX(), y)
                 coordinateLine.append(coordinate)
             
-        elif coordinateOne.getY() == coordinateTwo.getY():
-            # the y coordinate is the same, the line is horizontal
-            if coordinateOne.getX() < coordinateTwo.getX():
-                start = coordinateOne.getX()
-                end = coordinateTwo.getX() + 1
-            else:
-                start = coordinateTwo.getX()
-                end = coordinateOne.getX() + 1
+        # elif coordinateOne.getY() == coordinateTwo.getY():
+        #     # the y coordinate is the same, the line is horizontal
+        #     if coordinateOne.getX() < coordinateTwo.getX():
+        #         start = coordinateOne.getX()
+        #         end = coordinateTwo.getX() + 1
+        #     else:
+        #         start = coordinateTwo.getX()
+        #         end = coordinateOne.getX() + 1
             
-            for x in range(start, end):
-                # create a new coordinate with the same x, but different y
-                coordinate = Coordinate(x, coordinateOne.getY())
-                coordinateLine.append(coordinate)
+        #     for x in range(start, end):
+        #         # create a new coordinate with the same x, but different y
+        #         coordinate = Coordinate(x, coordinateOne.getY())
+        #         coordinateLine.append(coordinate)
         
         else:
-            # the lines are diagonal at a 45 degree angle
+            slope = ((coordinateTwo.getY() - coordinateOne.getY()) // (coordinateTwo.getX() - coordinateOne.getX()))
+            yIntercept = coordinateOne.getY() - slope * coordinateOne.getX()
+
             if coordinateOne.getX() < coordinateTwo.getX():
-                startX = coordinateOne.getX()
-                endX = coordinateTwo.getX() + 1
+                for x in range(coordinateOne.getX(), coordinateTwo.getX()):
+                    y = slope * x + yIntercept
+                    coordinate = Coordinate(x, y)
+                    coordinateLine.append(coordinate)
             else:
-                startX = coordinateTwo.getX()
-                endX = coordinateOne.getX() + 1
+                for x in range(coordinateOne.getX(), coordinateTwo.getX(), -1):
+                    y = slope * x + yIntercept
+                    coordinate = Coordinate(x, y)
+                    coordinateLine.append(coordinate)
+
+            # the lines are diagonal at a 45 degree angle
+            # if coordinateOne.getX() < coordinateTwo.getX():
+            #     startX = coordinateOne.getX()
+            #     endX = coordinateTwo.getX() + 1
+            # else:
+            #     startX = coordinateTwo.getX()
+            #     endX = coordinateOne.getX() - 1
             
-            if coordinateOne.getY() < coordinateTwo.getY():
-                startY = coordinateOne.getY()
-                endY = coordinateTwo.getY() + 1
-            else:
-                startY = coordinateTwo.getY()
-                endY = coordinateOne.getY() + 1
+            # if coordinateOne.getY() < coordinateTwo.getY():
+            #     startY = coordinateOne.getY()
+            #     endY = coordinateTwo.getY() + 1
+            # else:
+            #     startY = coordinateTwo.getY()
+            #     endY = coordinateOne.getY() -1 
             
-            for x, y in zip(range(startX, endX), range(startY, endY)):
-                # create a new coordinate
-                coordinate = Coordinate(x, y)
-                coordinateLine.append(coordinate)
+            # for x, y in zip(range(startX, endX), range(startY, endY)):
+            #     # create a new coordinate
+            #     coordinate = Coordinate(x, y)
+            #     coordinateLine.append(coordinate)
         
         return coordinateLine
     
@@ -215,7 +229,9 @@ def main():
     grid = Grid()
     for coordinate in coordinateList:
         grid.addCoordinate(coordinate)
-    count = grid.getMultipleLinesOverlapCount()
+
+    count = len([v for v in grid.getCoordinateDict().values() if v >= OVERLAPPED_LINES])
+
     print("The number of coordinates that are overlapped by more than {} lines are {}"
     .format(OVERLAPPED_LINES, count))
 
