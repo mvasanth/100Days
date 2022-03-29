@@ -28,58 +28,93 @@ def getCrabPositions(file):
 
     return positions
 
-def getFuelConsumptionForPosition(positions):
+class CrabFuelConsumption:
     """
-    Given a list of positions, returns a list of tuples where each tuple has the position and
-    the fixed fuel consumption associated with that position.
+    Models the rate at which fuel is consumed by crabs as they move to their most optimal position. 
+    Needs a list of horizontal positions (list of integers) and provides APIs to determine the least
+    fuel consumed for fixed rate and variable rate.
     """
-    maxP = max(positions)
-    posAndFuels = []
+    def __init__(self, positions):
+        self.positions = positions
+        self.sumDict = self.buildSumDict(max(positions) + 1)
+    
+    def getFixedRateFuelConsumption(self):
+        """
+        Given a list of positions, returns a list of tuples where each tuple has the position and
+        the fixed fuel consumption associated with that position.
+        """
+        maxP = max(self.positions)
+        posAndFuels = []
 
-    for i in range(maxP + 1):
-        fuel = 0
+        for i in range(maxP + 1):
+            fuel = 0
 
-        for pos in positions:
-            fuel += abs(pos - i)
-        
-        posAndFuels.append((i, fuel))
+            for pos in self.positions:
+                fuel += abs(pos - i)
+            
+            posAndFuels.append((i, fuel))
 
-    return posAndFuels
+        return posAndFuels
+    
+    def buildSumDict(self, steps):
+        sumDict = {}
 
-def getVariableRateFuelConsumption(positions):
-    """
-    Given a list of positions, returns a list of tuples where each tuple has the position and
-    the variable fuel consumption associated with that position.
-    """
-    maxP = max(positions)
-    posAndFuels = []
+        for i in range(steps):
+            sum = 0
+            for val in range(i + 1):
+                sum += val
+            
+            sumDict[i] = sum
 
-    for i in range(maxP + 1):
-        fuel = 0
-        steps = 0
+        return sumDict
+    
+    def getVariableRateFuelConsumption(self):
+        """
+        Given a list of positions, returns a list of tuples where each tuple has the position and
+        the variable fuel consumption associated with that position.
+        """
+        maxP = max(self.positions)
+        posAndFuels = []
 
-        for pos in positions:
-            steps = abs(pos - i)
-            fuel += sum([ x for x in range(steps + 1)])
-        
-        posAndFuels.append((i, fuel))
+        for i in range(maxP + 1):
+            fuel = 0
+            steps = 0
 
-    return posAndFuels
+            for pos in self.positions:
+                steps = abs(pos - i)
+                fuel += self.sumDict[steps]
+            
+            posAndFuels.append((i, fuel))
+
+        return posAndFuels
 
 def getBestFuelConsumption(posAndFuels):
+    """
+    Given a list of tuples of postions and the fuel consumption associated with that position,
+    returns the least/most efficient fuel that can be consumed by the crabs to move to the
+    optimal position.
+    """
     fuels = [x[1] for x in posAndFuels]
     bestFuel = min(fuels)
     return bestFuel
 
 def main():
+    """
+    Implementation of Day 7 of the Advent Calender 2021.
+    """
     positions = getCrabPositions(POSITION_FILE)
-    posAndFuels = getFuelConsumptionForPosition(positions)
+    crabFuelConsumption = CrabFuelConsumption(positions)
+
+    # Part 1: Get the least fixed rate fuel consumption
+    posAndFuels = crabFuelConsumption.getFixedRateFuelConsumption()
     bestFuel = getBestFuelConsumption(posAndFuels)
     print("The least amount of fuel that can be consumed is {}".format(bestFuel))
 
-    varPosAndFuels = getVariableRateFuelConsumption(positions)
+    # Part 2: Get the least variable rage fuel consumption
+    varPosAndFuels = crabFuelConsumption.getVariableRateFuelConsumption()
     bestVarFuel = getBestFuelConsumption(varPosAndFuels)
-    print("The least amount of fuel that can be consumed with variable fuel consumption is {}".format(bestVarFuel))
+    print("The least amount of fuel that can be consumed with variable fuel consumption is {}"
+    .format(bestVarFuel))
 
 if __name__ == "__main__":
     main()
