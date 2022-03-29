@@ -3,7 +3,6 @@ Implementatin of Day 6 of Advent of Code 2021.
 More details of the challenge can be found here:
 https://adventofcode.com/2021/day/6
 """
-from re import T
 from typing import Final
 
 NEW_LANTERNFISH_TIMER: Final = 8
@@ -13,7 +12,7 @@ TIMER_FILE = "/workspaces/advent2021/src/day6.txt"
 
 def getLanternfishTimers(file):
     """
-    Given a comma separated list of integers representing timer values, returns a list of integers
+    Given a string with comma separated list of integers representing timer values, returns a list of integers
     where each integer corresponds to the timer value of a lantern fish.
     """
     try:
