@@ -72,34 +72,35 @@ class LanternfishGrowth:
         count = 0
 
         while (count != self.days):
-            # List of indices to reset at the end of the day
-            endOfDay = []
+            numLanternfish = len(self.lanternfishes)
+            i = 0
 
-            for i, lanternfish in enumerate(self.lanternfishes):
-                if lanternfish.getTimer() == LANTERNFISH_TIMER_EXPIRY:
+            while i < numLanternfish:
+                if self.lanternfishes[i].getTimer() == LANTERNFISH_TIMER_EXPIRY:
                     # Reset the timer for this lanternfish
-                    lanternfish.resetTimer(LANTERNFISH_TIMER_RESET)
+                    self.lanternfishes[i].resetTimer(LANTERNFISH_TIMER_RESET)
 
                     # Start the timer for a new lanternfish
                     babyLanternfish = Lanternfish(NEW_LANTERNFISH_TIMER)
                     babyLanternfish.setIsNewTimer(True)
                     self.lanternfishes.append(babyLanternfish)
 
-                elif lanternfish.getTimer() == NEW_LANTERNFISH_TIMER:
+                elif self.lanternfishes[i].getTimer() == NEW_LANTERNFISH_TIMER:
                     # Fish was just added to the list, timer starts running from the next day
-                    if lanternfish.getIsNewTimer() == True:
-                        endOfDay.append(i)
+                    if self.lanternfishes[i].getIsNewTimer() == True:
+                        pass
                     else:
-                        lanternfish.decrementTimer()
+                        self.lanternfishes[i].decrementTimer()
                         
                 else:
-                    lanternfish.decrementTimer()
+                    self.lanternfishes[i].decrementTimer()
+                
+                i += 1
 
-            # the day has passed, update timer state for all the new fish
-            for lanternfish in self.lanternfishes:
-                if lanternfish.getTimer() == NEW_LANTERNFISH_TIMER:
-                    lanternfish.setIsNewTimer(False)
-
+            for i in range(numLanternfish, len(self.lanternfishes)):
+                self.lanternfishes[i].setIsNewTimer(False)
+            
+            print(count)
             count += 1
 
         return len(self.lanternfishes)
@@ -118,7 +119,7 @@ def main():
     lanternfishes = getLanternfishes(timers)
     growth = LanternfishGrowth(lanternfishes, 256)
     count = growth.simulateLanternfishGrowth()
-    print("Numer of lanternfish at the end of 80 days is {}".format(count))
+    print("Numer of lanternfish at the end of 256 days is {}".format(count))
 
 if __name__ == "__main__":
     main()
