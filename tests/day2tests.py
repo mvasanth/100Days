@@ -22,7 +22,7 @@ class testCommand(unittest.TestCase):
 class testGetCommandList(unittest.TestCase):
 
     def testGetCommandListValidFile(self):
-        commands = getCommandList("/workspaces/advent2021/tests/day2test.txt")
+        commands = getCommandList("/workspaces/advent2021/tests/inputs/day2test.txt")
         self.assertIsNotNone(commands)
         self.assertEqual(3, len(commands))
         self.assertEqual(CommandType.forward, commands[0].type)
@@ -34,13 +34,13 @@ class testGetCommandList(unittest.TestCase):
     
     def testGetCommandListInvalidFile(self):
         try:
-            commands = getCommandList("/workspaces/advent2021/tests/day2tests.txt")
+            commands = getCommandList("/workspaces/advent2021/tests/inputs/day2tests.txt")
         except OSError:
             self.assertRaises(FileNotFoundError)
     
     def testGetCommandListInvalidCommand(self):
         try:
-            commands = getCommandList("/workspaces/advent2021/tests/day2test_invalid.txt")
+            commands = getCommandList("/workspaces/advent2021/tests/inputs/day2test_invalid.txt")
         except UnknownCommandTypeError:
             self.assertRaises(UnknownCommandTypeError)
             

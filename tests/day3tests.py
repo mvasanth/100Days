@@ -5,7 +5,7 @@ import day3
 
 class testCommand(unittest.TestCase):
     def testGetDigitStringList(self):
-        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/inputs/day3test.txt")
         digitStringList = day3.getDigitStringList(binaryStrings)
         self.assertIsNotNone(digitStringList)
         self.assertEqual(5, len(digitStringList))
@@ -16,14 +16,14 @@ class testCommand(unittest.TestCase):
         self.assertEqual('000111100100', digitStringList[4])
     
     def testGetDigitStringListInvalidFile(self):
-        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/inputs/day3test.txt")
         try:
             digitStringList = day3.getDigitStringList(binaryStrings)
         except:
             self.assertRaises(FileNotFoundError)
 
     def testGetGammaBinary(self):
-        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrings = day3.getBinaryStringsList("/workspaces/advent2021/tests/inputs/day3test.txt")
         digitStringList = day3.getDigitStringList(binaryStrings)
         gammaBin = day3.getGammaBinary(digitStringList)
         self.assertEqual('10110', gammaBin)
@@ -39,17 +39,17 @@ class testCommand(unittest.TestCase):
         self.assertEqual(9, decimal)
     
     def testGetPrunedBinaryList(self):
-        binaryStrs = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrs = day3.getBinaryStringsList("/workspaces/advent2021/tests/inputs/day3test.txt")
         prunedList = day3.getPrunedBinaryList(binaryStrs, 0, '1')
         self.assertEqual(7, len(prunedList))
     
     def testGetOxygenGeneratorRatingBinary(self):
-        binaryStrs = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrs = day3.getBinaryStringsList("/workspaces/advent2021/tests/inputs/day3test.txt")
         oxygenGeneratorRating = day3.getOxygenGeneratorRatingBinary(binaryStrs)
         self.assertEqual('10111', oxygenGeneratorRating)
     
     def testGetCO2ScrubberRatingBinary(self):
-        binaryStrs = day3.getBinaryStringsList("/workspaces/advent2021/tests/day3test.txt")
+        binaryStrs = day3.getBinaryStringsList("/workspaces/advent2021/tests/inputs/day3test.txt")
         oxygenGeneratorRating = day3.getCO2ScrubberRatingBinary(binaryStrs)
         self.assertEqual('01010', oxygenGeneratorRating)
     

@@ -6,13 +6,13 @@ from day4 import Bingo
 
 class testCommand(unittest.TestCase):
     def testGetListOfLines(self):
-        lines = day4.getListOfLines("/workspaces/advent2021/tests/day4test.txt")
+        lines = day4.getListOfLines("/workspaces/advent2021/tests/inputs/day4test.txt")
         self.assertIsNotNone(lines)
         self.assertEqual(17, len(lines))
     
     def testGetRawGridsFromLines(self):
-        lines = day4.getListOfLines("/workspaces/advent2021/tests/day4test.txt")
-        nums = day4.getNumList("/workspaces/advent2021/tests/day4test_1.txt")
+        lines = day4.getListOfLines("/workspaces/advent2021/tests/inputs/day4test.txt")
+        nums = day4.getNumList("/workspaces/advent2021/tests/inputs/day4test_1.txt")
         rawGrids = day4.getRawGrids(lines)
         self.assertIsNotNone(rawGrids)
         self.assertEqual(3, len(rawGrids))
