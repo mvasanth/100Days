@@ -14,6 +14,19 @@ FOUR: Final = 4
 SEVEN: Final = 3
 EIGHT: Final = 7
 
+digitStringsDict: Final = {
+    "acedgfb": 8,
+    "cdfbe": 5,
+    "gcdfa": 2,
+    "fbcad": 3,
+    "dab": 7,
+    "cefabd": 9,
+    "cdfgeb": 6,
+    "eafb": 4,
+    "cagedb": 0,
+    "ab": 1
+}
+
 def getSignalPatterns(file):
     """
     Given an input file, retuns a list of lines, where each line is a string representing the
@@ -37,17 +50,21 @@ def getSignalPatterns(file):
 def getCompleteListOfFourDigitOutputSignals(signalPatterns, begin, end):
     """
     Given a list of strings representing the signal patterns (includes both input and output patterns),
-    returns a list of strings that has the output signals from all the input strings.
+    returns a list of lists, where each inner list has four strings corresponding to each digit in the 
+    four digit output signal.
     """
     outputSignals = []
 
     for pattern in signalPatterns:
+        signal = []
         m = re.match(r'([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+) \| ([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+)', pattern)
 
         # we only care about match groups 11-14, which is the four digit output signal
         # ignore the rest
         for i in range(begin, end):
-            outputSignals.append(m.group(i))
+            signal.append(m.group(i))
+        
+        outputSignals.append(signal)
         
     return outputSignals
 
@@ -60,17 +77,46 @@ def getUniqueDigitSignalCount(outputSignals):
     count = 0
 
     for signal in outputSignals:
-        if len(signal) == ONE or len(signal) == FOUR or len(signal) == SEVEN or len(signal) == EIGHT:
-            count += 1
+        for digit in signal:
+            if len(digit) == ONE or len(digit) == FOUR or len(digit) == SEVEN or len(digit) == EIGHT:
+                count += 1
     
     return count
+
+def getFourDigitOutput(fourDigitOutput):
+    """
+    Given a list of four strings where each string corresponds to a digit in the seven segment display,
+    returns the number that these four strings represent.
+    """
+    output = 0
+    outputStr = ''
+
+    for digit in fourDigitOutput:
+        outputStr += digitStringsDict[digit]
+    
+    output = int(outputStr)
+    return output
+
+def getTotalOfOutputSignals(outputSignals):
+    total = 0
+
+    for signal in outputSignals:
+        total += getFourDigitOutput(signal)
+    
+    return total
 
 def main():
     signalPatterns = getSignalPatterns(SIGNAL_PATTERNS)
     outputSignals = getCompleteListOfFourDigitOutputSignals(signalPatterns, 11, 15)
+
+    # Part 1
     numberUniqueDigits = getUniqueDigitSignalCount(outputSignals)
     print("Count of the number of output signals made of unique digits are: {}"
     .format(numberUniqueDigits))
+
+    # Part 2
+    total = getTotalOfOutputSignals(outputSignals)
+    print("Sum of all the four digit signals is {}".format(total))
 
 if __name__ == "__main__":
     main()
