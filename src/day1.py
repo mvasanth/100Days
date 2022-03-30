@@ -4,7 +4,7 @@ Details of Day 1 can be found here:
 https://adventofcode.com/2021/day/1
 """
 
-DEPTHS_FILE = "/workspaces/advent2021/src/day1.txt"
+DEPTHS_FILE = "/workspaces/advent2021/src/inputs/day1.txt"
 SLIDING_WINDOW_SIZE = 3
 
 def getDepthList():

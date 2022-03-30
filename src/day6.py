@@ -8,7 +8,7 @@ from typing import Final
 NEW_LANTERNFISH_TIMER: Final = 8
 LANTERNFISH_TIMER_RESET: Final = 6
 LANTERNFISH_TIMER_EXPIRY: Final = 0
-TIMER_FILE = "/workspaces/advent2021/src/day6.txt"
+TIMER_FILE = "/workspaces/advent2021/src/inputs/day6.txt"
 
 def getLanternfishTimers(file):
     """

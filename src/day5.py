@@ -5,7 +5,7 @@ https://adventofcode.com/2021/day/5
 """
 from typing import Final
 
-COORDINATE_LINES: Final = "/workspaces/advent2021/src/day5.txt"
+COORDINATE_LINES: Final = "/workspaces/advent2021/src/inputs/day5.txt"
 OVERLAPPED_LINES: Final = 2
 
 class Coordinate:

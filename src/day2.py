@@ -4,7 +4,7 @@ More details of the challenge can be found here:
 https://adventofcode.com/2021/day/2
 """
 from enum import Enum
-COMMANDS_FILE = "/workspaces/advent2021/src/day2.txt"
+COMMANDS_FILE = "/workspaces/advent2021/src/inputs/day2.txt"
 
 class CommandType(Enum):
     forward = 1 # increases the horizontal position

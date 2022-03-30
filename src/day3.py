@@ -5,7 +5,7 @@ https://adventofcode.com/2021/day/3
 """
 from typing import Final
 
-COMMANDS_FILE: Final = "/workspaces/advent2021/src/day3.txt"
+COMMANDS_FILE: Final = "/workspaces/advent2021/src/inputs/day3.txt"
 DIGIT_ZERO: Final = '0'
 DIGIT_ONE: Final = '1'
 

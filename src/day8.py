@@ -6,7 +6,7 @@ https://adventofcode.com/2021/day/8
 from typing import Final
 import re
 
-SIGNAL_PATTERNS: Final = "/workspaces/advent2021/src/day8.txt"
+SIGNAL_PATTERNS: Final = "/workspaces/advent2021/src/inputs/day8.txt"
 # The number of segments that need to be turned on to make the digit on the left in a 
 # seven segment display
 ONE: Final = 2

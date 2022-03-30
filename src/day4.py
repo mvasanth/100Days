@@ -5,8 +5,8 @@ https://adventofcode.com/2021/day/4
 """
 from typing import Final
 
-INPUT_NUMBERS: Final = "/workspaces/advent2021/src/day4_1.txt"
-BINGO_BOARDS: Final = "/workspaces/advent2021/src/day4.txt"
+INPUT_NUMBERS: Final = "/workspaces/advent2021/src/inputs/day4_1.txt"
+BINGO_BOARDS: Final = "/workspaces/advent2021/src/inputs/day4.txt"
 ROWS: Final = 5
 COLUMNS: Final = 5
 

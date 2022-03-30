@@ -5,7 +5,7 @@ https://adventofcode.com/2021/day/7
 """
 from typing import Final
 
-POSITION_FILE: Final = "/workspaces/advent2021/src/day7.txt"
+POSITION_FILE: Final = "/workspaces/advent2021/src/inputs/day7.txt"
 
 def getCrabPositions(file):
     """
