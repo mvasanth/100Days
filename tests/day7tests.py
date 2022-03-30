@@ -1,4 +1,3 @@
-from turtle import pos
 import unittest
 import sys
 sys.path.insert(1, '/workspaces/advent2021/src')
