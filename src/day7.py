@@ -9,7 +9,7 @@ POSITION_FILE: Final = "/workspaces/advent2021/src/inputs/day7.txt"
 
 def getCrabPositions(file):
     """
-    Given a string with comma separated list of integers representing the horizontal positions of crabs,
+    Given a file with comma separated list of integers representing the horizontal positions of crabs,
     returns a list of integers where each integer corresponds to the horizontal position of a crab.
     """
     try:

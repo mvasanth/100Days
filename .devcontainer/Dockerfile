@@ -4,11 +4,14 @@ FROM debian:bullseye-slim as dev-env
 RUN apt-get update \
     #
     # install the things we want
-    && apt-get install -y sudo git python3 python3-tk\
+    && apt-get install -y sudo git python3 python3-tk wget curl\
     #
     # clean up apt-get files
     && apt-get clean  \
     && rm -rf /var/lib/apt/lists/
+
+# VSCode Live Share in DevContainers
+RUN wget -O ~/vsls-reqs https://aka.ms/vsls-linux-prereq-script && chmod +x ~/vsls-reqs && ~/vsls-reqs
 
 # Add non-root user
 ARG USERNAME=developer
