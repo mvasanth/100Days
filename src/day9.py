@@ -3,6 +3,7 @@ Implementatin of Day 9 of Advent of Code 2021.
 More details of the challenge can be found here:
 https://adventofcode.com/2021/day/9
 """
+from array import array
 from typing import Final
 
 HEIGHTS: Final = "/workspaces/advent2021/src/inputs/day9.txt"
@@ -52,21 +53,22 @@ def getHeightMap(heightLines):
 
 def isLowPoint(point, row, column, rows, columns, heightMap):
 
-    # generate offset positions (0, +1), (0, -1), (+1, 0), (-1, 0)
-    neighbours = [ point.OffsetBy(0, 1), point.OffsetBy(0, -1), point.OffsetBy(1, 0), point.OffsetBy(-1, 0) ]
+    # # generate offset positions (0, +1), (0, -1), (+1, 0), (-1, 0)
+    # neighbours = [ heightMap[(row, column + 1)], heightMap[(row, column -1)], 
+    #                heightMap[(row - 1, column)], heightMap[(row + 1, column)] ]
 
-    # filter out invalid positions
-    validNeighbours = [ n for n in neighbours if n.x >= 0 and n.x < columns and n.y >= 0 and n.y < rows ]
+    # # filter out invalid positions
+    # validNeighbours = [ n for n in neighbours if n.x >= 0 and n.x < columns and n.y >= 0 and n.y < rows ]
 
-    # use a loop over valid positions to see if `point` is lowest
-    neighbourHeights = [ heightMap(n.x, n.y) for n in validNeighbours ]
+    # # use a loop over valid positions to see if `point` is lowest
+    # neighbourHeights = [ heightMap(n.x, n.y) for n in validNeighbours ]
     
-    pointHeight = heightMap(point.x, point.y)
+    # pointHeight = heightMap(point.x, point.y)
 
-    if (neighbourHeights.All(h => h < pointHeight))
-    {
-        # we have found a low point.
-    }
+    # if (neighbourHeights.All(h => h < pointHeight))
+    # {
+    #     # we have found a low point.
+    # }
 
     if row == FIRST_ROW:
         if column == FIRST_COLUMN:
@@ -147,25 +149,43 @@ def isLowPoint(point, row, column, rows, columns, heightMap):
     return False
 
 def getLowPoints(heightMap, rows, columns):
-    lowPoints = []
+    lowPoints = {}
 
     for row in range(rows):
         for column in range(columns):
             point = heightMap[(row, column)]
 
             if isLowPoint(point, row, column, rows, columns, heightMap):
-                lowPoints.append(point)
+                lowPoints[(row, column)] = point
     
     return lowPoints
 
 def getTotalRiskLevel(lowPoints):
     riskLevel = 0
 
-    for lowPoint in lowPoints:
+    for lowPoint in lowPoints.values():
         # The risk level of a low point is 1 plus it's height
         riskLevel += lowPoint + 1
 
     return riskLevel
+
+def getDistance():
+    pass
+
+def getLowPointBasin(heightMap, lowPoints, rows, columns):
+
+    lowPointBasin = {}
+
+    for row in range(rows):
+        for column in range(columns):
+            point = heightMap[(row, column)]
+
+            for lowPoint in lowPoints:
+                distance = getDistance(heightMap[row, column], lowPoint)
+            if isLowPoint(point, row, column, rows, columns, heightMap):
+                lowPoints[(row, column)] = point
+    
+    return lowPointBasin
                 
 def main():
     heightLines = getHeightLines(HEIGHTS)

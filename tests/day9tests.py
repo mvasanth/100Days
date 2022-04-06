@@ -22,11 +22,5 @@ class testDay9(unittest.TestCase):
         riskLevel = day9.getTotalRiskLevel(lowPoints)
         self.assertEqual(15, riskLevel)
 
-    # def testGetTotalOfOutputSignals(self):
-    #     signalPatterns = day8.getSignalPatterns("/workspaces/advent2021/tests/inputs/day8test.txt")
-    #     outputSignals = day8.getCompleteListOfFourDigitOutputSignals(signalPatterns, 11, 15)
-    #     total = day8.getTotalOfOutputSignals(outputSignals)
-    #     self.assertEqual(61229, total)
-
 if __name__ == '__main__':
     unittest.main()
