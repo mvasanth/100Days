@@ -39,6 +39,7 @@ def getIllegalCharDict(rawSyntax):
     Processes each line of the syntax file and returns a dictionary of all the illegal characters.
     """
     illegalCharDict = {}
+    matchStrings = []
 
     for syntaxLine in rawSyntax:
         char = processLine(syntaxLine)
@@ -49,8 +50,11 @@ def getIllegalCharDict(rawSyntax):
                 illegalCharDict[char] = 1
             else:
                 illegalCharDict[char] += 1
+        else:
+            matchStrings.append(char)
     
-    return illegalCharDict
+    matchStrings = [string[::-1] for string in matchStrings]
+    return (illegalCharDict, matchStrings)
 
 class UnidentifiedCharException(Exception):
     """
@@ -111,6 +115,15 @@ class SyntaxErrorHandling():
         
         return totalSyntaxErrors
 
+def getCompletionStrings(matchStrings):
+    completionStrs = []
+
+    for matchString in matchStrings:
+        completionStr = getCompletionString(matchString)
+        completionStrs.append(completionStr)
+
+    return completionStrs
+
 def getCompletionString(matchChars):
     """
     Given a string containing opening characters (, [, { or <, returns a string of equal length
@@ -157,7 +170,7 @@ def getCompletionStrScore(completionStr):
                   '>': 4}
 
     for char in completionStr:
-        score += 5 * scoreDict[char]
+        score = (score * 5) + scoreDict[char]
     
     return score
 
@@ -167,16 +180,24 @@ def getMiddleScore(scores):
     """
     scores.sort()
 
-    middle = scores // 2
+    middle = len(scores) // 2
 
     return scores[middle]
 
 def main():
     rawSyntax = getRawSyntax(SYNTAX)
-    illegalCharDict = getIllegalCharDict(rawSyntax)
+    (illegalCharDict, matchStrings) = getIllegalCharDict(rawSyntax)
+
+    # Part 1
     syntaxErrorHandling = SyntaxErrorHandling(illegalCharDict)
     totalErrors = syntaxErrorHandling.getTotalSyntaxErrorScore()
     print("Total Syntax Errors are {}".format(totalErrors))
+
+    # Part 2
+    completionStrs = getCompletionStrings(matchStrings)
+    scores = getScoresList(completionStrs)
+    middleScore = getMiddleScore(scores)
+    print("Middle Score = {}".format(middleScore))
 
 if __name__ == "__main__":
     main()
