@@ -17,7 +17,7 @@ class testSyntaxNavSubsystem(unittest.TestCase):
                        '<{([([[(<>()){}]>(<<{{',
                        '<{([{{}}[<[[[<>{}]]]>[]]']
         
-        (illegalCharDict, matchStrings) = day10.getIllegalCharDict(syntaxLines)
+        (illegalCharDict, matchStrings) = day10.getIllegalCharDictAndMatchStrings(syntaxLines)
         syntaxErrorHandling = SyntaxErrorHandling(illegalCharDict)
         totalErrors = syntaxErrorHandling.getTotalSyntaxErrorScore()
         self.assertEqual(26397, totalErrors)

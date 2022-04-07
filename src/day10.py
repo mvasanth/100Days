@@ -1,14 +1,8 @@
-# scan the list of characters from left to right
-# if it is an opening character, (, [, < or { then add it to a list
-# if it is a closing character, check the last item in the list, 
-#   if it is a match for the character I'm currently seeing, 
-#       remove the last character from the list - the string is still valid
-#   if it is not a match, the character is illegal:
-#       the string is corrupted, add the corrupted character to a list of corrupted characters
-#       exit, no point in scanning further
-# continue scanning the list until the end
-
-# What do I need?
+"""
+Implementatin of Day 9 of Advent of Code 2021.
+More details of the challenge can be found here:
+https://adventofcode.com/2021/day/10
+"""
 
 from typing import Final
 
@@ -34,9 +28,15 @@ def getRawSyntax(file):
 
     return rawSyntax
 
-def getIllegalCharDict(rawSyntax):
+def getIllegalCharDictAndMatchStrings(rawSyntax):
     """
-    Processes each line of the syntax file and returns a dictionary of all the illegal characters.
+    Processes each line of the syntax file and returns a tuple. 
+
+    The first element of the tuple is a dictionary, where the keys are the characters that caused
+    the line to be corrupted, and the values are the occurrences of these characters in the syntax lines.
+
+    The second element of the tuple is a list of strings. Where each string is a sequence of characters
+    that need to be appended to all the valid but incomplete strings in the given raw syntax.
     """
     illegalCharDict = {}
     matchStrings = []
@@ -53,6 +53,7 @@ def getIllegalCharDict(rawSyntax):
         else:
             matchStrings.append(char)
     
+    # reverse the string, as we need to close the last open brace first
     matchStrings = [string[::-1] for string in matchStrings]
     return (illegalCharDict, matchStrings)
 
@@ -186,7 +187,7 @@ def getMiddleScore(scores):
 
 def main():
     rawSyntax = getRawSyntax(SYNTAX)
-    (illegalCharDict, matchStrings) = getIllegalCharDict(rawSyntax)
+    (illegalCharDict, matchStrings) = getIllegalCharDictAndMatchStrings(rawSyntax)
 
     # Part 1
     syntaxErrorHandling = SyntaxErrorHandling(illegalCharDict)
