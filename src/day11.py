@@ -187,9 +187,22 @@ class OctoGrid():
         return all(energy == 0 for energy in energyLevels)
 
     def simulateSteps(self, steps):
-        for step in range(steps):
+        for _ in range(steps):
             self.simulateStep()
-        
+    
+    def getAllOctopiSynchronizedStep(self):
+        step = 0
+        energyLevels = [octopus.getEnergy() for octopus in self.octoGrid.values()
+                            if octopus.getEnergy() != INVALID_ENERGY_LEVEL]
+            
+        while not self.allEqual(energyLevels):
+            step += 1
+            self.simulateStep()
+            energyLevels = [octopus.getEnergy() for octopus in self.octoGrid.values()
+                            if octopus.getEnergy() != INVALID_ENERGY_LEVEL]
+            
+        return step
+    
     def getTotalFlashes(self):
         totalFlashes = 0
 
@@ -204,9 +217,15 @@ class OctoGrid():
 def main():
     energyLevels = getOctopusEnergyLevelStrings(ENERGY_LEVLES)
     octoGrid = OctoGrid(energyLevels)
+
+    # PART 1
     octoGrid.simulateSteps(100)
     flashes = octoGrid.getTotalFlashes()
     print("Total number of flashes = {}".format(flashes))
+
+    # PART 2
+    step = octoGrid.getAllOctopiSynchronizedStep()
+    print("All octopi synchronize at step {}".format(step))
 
 if __name__ == "__main__":
     main()
