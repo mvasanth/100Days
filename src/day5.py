@@ -22,6 +22,9 @@ class Coordinate:
     def getY(self):
         return self.y
     
+    def getOffset(self, row, column):
+        return Coordinate(self.x + row, self.y + column)
+    
     def __eq__(self, other):
         if not isinstance(other, Coordinate):
             # don't attempt to compare against unrelated types
