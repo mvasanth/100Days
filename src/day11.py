@@ -4,7 +4,7 @@ More details of the challenge can be found here:
 https://adventofcode.com/2021/day/11
 """
 from typing import Final
-from day5 import Coordinate
+from utilities.Coordinate import Coordinate
 
 ENERGY_LEVLES: Final = "/workspaces/advent2021/src/inputs/day11.txt"
 INVALID_ENERGY_LEVEL: Final = -1

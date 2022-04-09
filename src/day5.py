@@ -4,36 +4,10 @@ More details of the challenge can be found here:
 https://adventofcode.com/2021/day/5
 """
 from typing import Final
+from utilities.Coordinate import Coordinate
 
 COORDINATE_LINES: Final = "/workspaces/advent2021/src/inputs/day5.txt"
 OVERLAPPED_LINES: Final = 2
-
-class Coordinate:
-    """
-    Models a single coordinate.
-    """
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    
-    def getX(self):
-        return self.x
-
-    def getY(self):
-        return self.y
-    
-    def getOffset(self, row, column):
-        return Coordinate(self.x + row, self.y + column)
-    
-    def __eq__(self, other):
-        if not isinstance(other, Coordinate):
-            # don't attempt to compare against unrelated types
-            return NotImplemented
-        
-        return self.x == other.getX() and self.y == other.getY()
-    
-    def __hash__(self):
-        return hash((self.x, self.y))
 
 class Grid:
     """

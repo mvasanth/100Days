@@ -3,14 +3,16 @@ Implementatin of Day 9 of Advent of Code 2021.
 More details of the challenge can be found here:
 https://adventofcode.com/2021/day/9
 """
-from array import array
+from functools import reduce
 from typing import Final
+from utilities.Coordinate import Coordinate
 
 HEIGHTS: Final = "/workspaces/advent2021/src/inputs/day9.txt"
 FIRST_ROW:Final = 0
 FIRST_COLUMN: Final = 0
+INVALID_HEIGHT: Final = -1
 
-def getHeightLines(file):
+def getRawHeights(file):
     """
     Given a file where each line is a sequence of digits 0-9, returns each line of the file as
     a separate string.
@@ -21,177 +23,112 @@ def getHeightLines(file):
         print("Could not open file")
         raise FileNotFoundError
 
-    heightLines = inFile.readlines()
+    rawHeights = inFile.readlines()
 
     # strip the trailing newline at the end of each line
-    heightLines = [line.strip() for line in heightLines]
+    rawHeights = [line.strip() for line in rawHeights]
 
     inFile.close()
 
-    return heightLines
+    return rawHeights
 
-def getHeightMap(heightLines):
+class Height():
     """
-    Given a list of strings of equal length where each string is a sequence of digits, return a
-    dictionary where the key is a tuple with the row and column (the position of the height in the map),
-    and the value is an integer representing the height.
+    Models a height object as defined in Day 9 of the Advent calender 2021.
+    Every height has a value indicating it's height, a boolean to indicate if it is a low point
+    and a basin, which is a list of all the heights that flow into a particular low point. 
+    Note that a height has a basin only if it is a low point.
     """
-    row = 0
-    heightMap = {}
+    def __init__(self, height):
+        self.height = height
+        self.isLowPoint = False
+        self.basin = []
 
-    for heightLine in heightLines:
-        column = 0
+    def getHeight(self):
+        return self.height
+    
+    def getIsLowPoint(self):
+        return self.isLowPoint
+    
+    def getBasin(self):
+        return self.basin
+    
+    def setIsLowPoint(self,isLowPoint):
+        self.isLowPoint = isLowPoint
+    
+    def addToBasin(self, height):
+        self.basin.append(height)
 
-        for height in heightLine:
-            key = (row, column)
-            heightMap[key] = int(height)
-            column += 1
+class HeightGrid():
+    def __init__(self, rawHeights):
+        self.rawHeights = rawHeights
+        self.heightGrid = self.buildHeightGrid()
+    
+    def buildHeightGrid(self):
+        heightGrid = {}
+
+        # For ease of finding neighbours of a given coordinate in the grid, we will also populate
+        # the edges outside the given set of coordinates i.e, row: -1 and row: max + 1 and
+        # column: -1 and column: max + 1. 
+
+        rows = len(self.rawHeights)
+        columns = len(self.rawHeights[0])
+
+        for row in range(-1, rows + 1):
+            # get the list of energy levels associated with this row
+            if not (row == -1 or row == rows):
+                heightList = list(self.rawHeights[row])
+
+            for column in range(-1, columns + 1):
+                coordinate = Coordinate(row, column)
+
+                if row == -1 or row == rows or column == -1 or column == columns:
+                    height = Height(INVALID_HEIGHT)
+                    heightGrid[coordinate] = height
+                else:
+                    height = Height(int(heightList[column]))
+                    heightGrid[coordinate] = height
         
-        row += 1
+        return heightGrid
+
+    def getHeightGrid(self):
+        return self.heightGrid
     
-    return (heightMap, row, column)
-
-def isLowPoint(point, row, column, rows, columns, heightMap):
-
-    # # generate offset positions (0, +1), (0, -1), (+1, 0), (-1, 0)
-    # neighbours = [ heightMap[(row, column + 1)], heightMap[(row, column -1)], 
-    #                heightMap[(row - 1, column)], heightMap[(row + 1, column)] ]
-
-    # # filter out invalid positions
-    # validNeighbours = [ n for n in neighbours if n.x >= 0 and n.x < columns and n.y >= 0 and n.y < rows ]
-
-    # # use a loop over valid positions to see if `point` is lowest
-    # neighbourHeights = [ heightMap(n.x, n.y) for n in validNeighbours ]
-    
-    # pointHeight = heightMap(point.x, point.y)
-
-    # if (neighbourHeights.All(h => h < pointHeight))
-    # {
-    #     # we have found a low point.
-    # }
-
-    if row == FIRST_ROW:
-        if column == FIRST_COLUMN:
-            # this is the top left corner
-            if (point < heightMap[(row, column + 1)]
-                and point < heightMap[(row + 1, column)]):
-                return True
-            else:
-                return False
+    def markLowPoint(self, coordinate):
+        if self.heightGrid[coordinate].getHeight() == INVALID_HEIGHT:
+            return 
         
-        elif column == columns - 1:
-            # this is the top right corner
-            if (point < heightMap[(row, column - 1)]
-                and point < heightMap[row + 1, column]):
-                return True
-            else:
-                return False
-        else:
-            # this is the top edge of the map
-            if (point < heightMap[(row, column - 1)]
-                and point < heightMap[(row, column + 1)]
-                and point < heightMap[row + 1, column]):
-                return True
-            else:
-                return False
+        # get all it's neighbours, this is a list of coordinates
+        neighbours = [coordinate.getOffset(0, -1), coordinate.getOffset(0, 1), # left and right neighbours
+                      coordinate.getOffset(-1, 0), coordinate.getOffset(+1, 0)] # top and bottom neighbours
+
+        # filter out the invalid neighbours    
+        validNeighbours = [neighbour for neighbour in neighbours
+                            if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT]
+        
+        # get the height of this coordinate
+        height = self.heightGrid[coordinate].getHeight()
+
+        # check if it's height is lower than all it's neighbours
+        if all(height < self.heightGrid[neighbour].getHeight() 
+                for neighbour in validNeighbours):
+            self.heightGrid[coordinate].setIsLowPoint(True)
+
+    def markLowPoints(self):
+        for coordinate in self.heightGrid:
+            self.markLowPoint(coordinate)        
     
-    if row == rows - 1:
-        if column == FIRST_COLUMN:
-            # this is the bottom left corner
-            if (point < heightMap[(row - 1, column)]
-                and point < heightMap[(row, column + 1)]):
-                return True
-            else:
-                return False
-    
-        elif column == columns - 1:
-            # this is the bottom right corner
-            if (point < heightMap[(row - 1, column)]
-                and point < heightMap[(row, column - 1)]):
-                return True
-            else:
-                return False
-    
-        else:
-            # this is the bottom edge
-            if (point < heightMap[(row, column - 1)]
-                and point < heightMap[(row, column + 1)]
-                and point < heightMap[(row - 1, column)]):
-                return True
-            else:
-                return False
-    
-    if column == FIRST_COLUMN:
-        # this is the left edge
-        if (point < heightMap[(row - 1, column)]
-            and point < heightMap[(row + 1, column)]
-            and point < heightMap[(row, column + 1)]):
-            return True
-        else:
-            return False
+    def getRiskLevel(self):
+        riskLevel = sum ([height.getHeight() + 1 for height in self.heightGrid.values()
+                        if height.getIsLowPoint()])
 
-    if column == columns - 1:
-        # this is the right edge
-        if (point < heightMap[(row - 1, column)]
-            and point < heightMap[(row + 1, column)]
-            and point < heightMap[(row, column - 1)]):
-            return True
-        else:
-            return False
-
-    # general case
-    if (point < heightMap[(row, column + 1)]
-        and point < heightMap[row, column - 1]
-        and point < heightMap[row + 1, column]
-        and point < heightMap[row - 1, column]):
-        return True
-    
-    return False
-
-def getLowPoints(heightMap, rows, columns):
-    lowPoints = {}
-
-    for row in range(rows):
-        for column in range(columns):
-            point = heightMap[(row, column)]
-
-            if isLowPoint(point, row, column, rows, columns, heightMap):
-                lowPoints[(row, column)] = point
-    
-    return lowPoints
-
-def getTotalRiskLevel(lowPoints):
-    riskLevel = 0
-
-    for lowPoint in lowPoints.values():
-        # The risk level of a low point is 1 plus it's height
-        riskLevel += lowPoint + 1
-
-    return riskLevel
-
-def getDistance():
-    pass
-
-def getLowPointBasin(heightMap, lowPoints, rows, columns):
-
-    lowPointBasin = {}
-
-    for row in range(rows):
-        for column in range(columns):
-            point = heightMap[(row, column)]
-
-            for lowPoint in lowPoints:
-                distance = getDistance(heightMap[row, column], lowPoint)
-            if isLowPoint(point, row, column, rows, columns, heightMap):
-                lowPoints[(row, column)] = point
-    
-    return lowPointBasin
+        return riskLevel
                 
 def main():
-    heightLines = getHeightLines(HEIGHTS)
-    (heightMap, rows, columns) = getHeightMap(heightLines)
-    lowPoints = getLowPoints(heightMap, rows, columns)
-    riskLevel = getTotalRiskLevel(lowPoints)
+    rawHeights = getRawHeights(HEIGHTS)
+    heightGrid = HeightGrid(rawHeights)
+    heightGrid.markLowPoints()
+    riskLevel = heightGrid.getRiskLevel()
     print("Risk Level = {}".format(riskLevel))
 
 if __name__ == "__main__":
