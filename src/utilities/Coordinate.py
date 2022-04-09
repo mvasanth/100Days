@@ -1,3 +1,5 @@
+from cmath import sqrt
+
 class Coordinate:
     """
     Models a single coordinate.
@@ -24,3 +26,9 @@ class Coordinate:
     
     def __hash__(self):
         return hash((self.x, self.y))
+    
+    def __sub__(self, other):
+        return (abs(self.x - other.x) + abs(self.y - other.y))
+    
+    def getDistance(self, other):
+        return ((other.x - self.x)**2 + (other.y - self.y)**2)

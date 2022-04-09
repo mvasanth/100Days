@@ -1,5 +1,5 @@
 """
-Implementatin of Day 7 of Advent of Code 2021.
+Implementatin of Day 11 of Advent of Code 2021.
 More details of the challenge can be found here:
 https://adventofcode.com/2021/day/11
 """

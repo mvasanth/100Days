@@ -3,13 +3,10 @@ Implementatin of Day 9 of Advent of Code 2021.
 More details of the challenge can be found here:
 https://adventofcode.com/2021/day/9
 """
-from functools import reduce
 from typing import Final
 from utilities.Coordinate import Coordinate
 
 HEIGHTS: Final = "/workspaces/advent2021/src/inputs/day9.txt"
-FIRST_ROW:Final = 0
-FIRST_COLUMN: Final = 0
 INVALID_HEIGHT: Final = -1
 
 def getRawHeights(file):
@@ -94,8 +91,14 @@ class HeightGrid():
     def getHeightGrid(self):
         return self.heightGrid
     
+    def getHeightForCoordinate(self, coordinate):
+        return self.heightGrid[coordinate].getHeight()
+    
+    def setLowPointForCoordinate(self, coordinate, isLowPoint):
+        self.heightGrid[coordinate].setIsLowPoint(isLowPoint)
+    
     def markLowPoint(self, coordinate):
-        if self.heightGrid[coordinate].getHeight() == INVALID_HEIGHT:
+        if self.getHeightForCoordinate(coordinate) == INVALID_HEIGHT:
             return 
         
         # get all it's neighbours, this is a list of coordinates
@@ -104,15 +107,15 @@ class HeightGrid():
 
         # filter out the invalid neighbours    
         validNeighbours = [neighbour for neighbour in neighbours
-                            if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT]
+                            if self.getHeightForCoordinate(neighbour) != INVALID_HEIGHT]
         
         # get the height of this coordinate
-        height = self.heightGrid[coordinate].getHeight()
+        height = self.getHeightForCoordinate(coordinate)
 
         # check if it's height is lower than all it's neighbours
-        if all(height < self.heightGrid[neighbour].getHeight() 
+        if all(height < self.getHeightForCoordinate(neighbour) 
                 for neighbour in validNeighbours):
-            self.heightGrid[coordinate].setIsLowPoint(True)
+            self.setLowPointForCoordinate(coordinate, True)
 
     def markLowPoints(self):
         for coordinate in self.heightGrid:
@@ -123,7 +126,36 @@ class HeightGrid():
                         if height.getIsLowPoint()])
 
         return riskLevel
-                
+
+    def updateLowPointCoordinateBasin(self, lowPoint, coordinate):
+        self.heightGrid[lowPoint].addToBasin(self.getHeightForCoordinate(coordinate))
+    
+    def populateLowPointBasins(self):
+        lowPointCoordinates = [coordinate for coordinate in self.heightGrid.keys()
+                                if self.heightGrid[coordinate].getIsLowPoint()]
+        
+        validCoordinates = [coordinate for coordinate in self.heightGrid.keys() 
+                            if self.getHeightForCoordinate(coordinate) != INVALID_HEIGHT]
+        
+        basinCoordinates = [coordinate for coordinate in validCoordinates
+                            if self.getHeightForCoordinate(coordinate) != 9]
+
+        for coordinate in basinCoordinates:
+            # get the distance of this coordinate with all the low points
+            distCoords = ([((coordinate.getDistance(lpCoordinate)), lpCoordinate) for lpCoordinate in lowPointCoordinates])
+
+            # get the low point that has the least distance with this coordinate
+            minDistCoord = min(distCoords, key = lambda t: t[0])
+
+            # add this coordinate to this low point's basin
+            self.updateLowPointCoordinateBasin(minDistCoord[1], coordinate)
+    
+    def getLowPoints(self):
+        lowPoints = [self.heightGrid[coordinate] for coordinate in self.heightGrid
+                        if self.heightGrid[coordinate].getIsLowPoint()]
+        
+        return lowPoints
+        
 def main():
     rawHeights = getRawHeights(HEIGHTS)
     heightGrid = HeightGrid(rawHeights)
