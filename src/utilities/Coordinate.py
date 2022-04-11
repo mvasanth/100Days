@@ -31,4 +31,10 @@ class Coordinate:
         return (abs(self.x - other.x) + abs(self.y - other.y))
     
     def getDistance(self, other):
-        return ((other.x - self.x)**2 + (other.y - self.y)**2)
+        if self.x == other.x:
+            return abs(other.y - self.y)
+        elif self.y == other.y:
+            return abs(other.x - self.x)
+        else:
+            dist = sqrt((other.x - self.x)**2 + (other.y - self.y)**2)
+            return dist.real

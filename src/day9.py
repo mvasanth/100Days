@@ -126,6 +126,45 @@ class HeightGrid():
                         if height.getIsLowPoint()])
 
         return riskLevel
+    
+    def populateLowPointBasins(self):
+        lowPointCoordinates = [coordinate for coordinate in self.heightGrid.keys()
+                                if self.heightGrid[coordinate].getIsLowPoint()]
+        
+        for coordinate in lowPointCoordinates:
+            # get all it's neighbours
+            neighbours = [coordinate.getOffset(0, -1), coordinate.getOffset(0, 1), # left and right neighbours
+                          coordinate.getOffset(-1, 0), coordinate.getOffset(+1, 0), # top and bottom neighbours
+                          coordinate.getOffset(-1, -1), coordinate.getOffset(-1, +1), # top diagonal neighbours
+                          coordinate.getOffset(1, -1), coordinate.getOffset(1, 1)] # bottom diagonal neighbours
+            
+            validNeighbours = [neighbour for neighbour in neighbours
+                                if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT]
+            
+            # these belong to the basin of this low point
+            basinNeighbours = [neighbour for neighbour in validNeighbours
+                                if self.getHeightForCoordinate(neighbour) != 9]
+            
+            for bn in basinNeighbours:
+                self.heightGrid[coordinate].addToBasin(bn, self.heightGrid[bn])
+            
+            for bn in basinNeighbours:
+                # get all it's neighbours
+                neighbours = [bn.getOffset(0, -1), bn.getOffset(0, 1), # left and right neighbours
+                            bn.getOffset(-1, 0), bn.getOffset(+1, 0), # top and bottom neighbours
+                            bn.getOffset(-1, -1), bn.getOffset(-1, +1), # top diagonal neighbours
+                            bn.getOffset(1, -1), bn.getOffset(1, 1)] # bottom diagonal neighbours
+                
+                validNeighbours = [neighbour for neighbour in neighbours
+                                    if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT]
+                
+                # these belong to the basin of this low point
+                bns = [neighbour for neighbour in validNeighbours
+                                    if self.getHeightForCoordinate(neighbour) != 9]
+                
+                for n in basinNeighbours:
+                    self.heightGrid[coordinate].addToBasin(n, self.heightGrid[n])
+            
 
     def updateLowPointCoordinateBasin(self, lowPoint, coordinate):
         self.heightGrid[lowPoint].addToBasin(self.getHeightForCoordinate(coordinate))

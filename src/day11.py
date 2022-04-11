@@ -6,7 +6,7 @@ https://adventofcode.com/2021/day/11
 from typing import Final
 from utilities.Coordinate import Coordinate
 
-ENERGY_LEVLES: Final = "/workspaces/advent2021/src/inputs/day11.txt"
+ENERGY_LEVELS: Final = "/workspaces/advent2021/src/inputs/day11.txt"
 INVALID_ENERGY_LEVEL: Final = -1
 INVALID_FLASH_COUNT: Final = -1
 HIGHEST_ENERGY_LEVEL: Final = 9
@@ -215,15 +215,16 @@ class OctoGrid():
         return totalFlashes
 
 def main():
-    energyLevels = getOctopusEnergyLevelStrings(ENERGY_LEVLES)
-    octoGrid = OctoGrid(energyLevels)
+    energyLevels = getOctopusEnergyLevelStrings(ENERGY_LEVELS)
 
     # PART 1
+    octoGrid = OctoGrid(energyLevels)
     octoGrid.simulateSteps(100)
     flashes = octoGrid.getTotalFlashes()
     print("Total number of flashes = {}".format(flashes))
 
     # PART 2
+    octoGrid = OctoGrid(energyLevels)
     step = octoGrid.getAllOctopiSynchronizedStep()
     print("All octopi synchronize at step {}".format(step))
 
