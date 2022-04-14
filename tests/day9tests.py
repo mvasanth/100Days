@@ -11,9 +11,10 @@ class testDay9(unittest.TestCase):
         heightGrid.markLowPoints()
         riskLevel = heightGrid.getRiskLevel()
         self.assertEqual(15, riskLevel)
-        heightGrid.populateLowPointBasins()
-        lowPoints = heightGrid.getLowPoints()
-        self.assertEqual(0, 0)
+        heightGrid.colourGrid()
+        sortedColours = day9.getOrderedBasinSizes(heightGrid.getHeightGrid())
+        result = day9.getFinalResult(sortedColours)
+        self.assertEqual(1134, result)
 
 if __name__ == '__main__':
     unittest.main()

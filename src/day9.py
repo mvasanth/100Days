@@ -3,11 +3,14 @@ Implementatin of Day 9 of Advent of Code 2021.
 More details of the challenge can be found here:
 https://adventofcode.com/2021/day/9
 """
+import queue
 from typing import Final
+from collections import Counter
 from utilities.Coordinate import Coordinate
 
 HEIGHTS: Final = "/workspaces/advent2021/src/inputs/day9.txt"
 INVALID_HEIGHT: Final = -1
+MAX_HEIGHT: Final = 9
 
 def getRawHeights(file):
     """
@@ -39,7 +42,7 @@ class Height():
     def __init__(self, height):
         self.height = height
         self.isLowPoint = False
-        self.basin = []
+        self.colour = 0
 
     def getHeight(self):
         return self.height
@@ -47,14 +50,17 @@ class Height():
     def getIsLowPoint(self):
         return self.isLowPoint
     
-    def getBasin(self):
-        return self.basin
-    
     def setIsLowPoint(self,isLowPoint):
         self.isLowPoint = isLowPoint
     
-    def addToBasin(self, height):
-        self.basin.append(height)
+    def setColour(self, colour):
+        self.colour = colour
+    
+    def getColour(self):
+        return self.colour
+    
+    def isColourSet(self):
+        return True if self.colour > 0 else False
 
 class HeightGrid():
     def __init__(self, rawHeights):
@@ -127,80 +133,87 @@ class HeightGrid():
 
         return riskLevel
     
-    def populateLowPointBasins(self):
-        lowPointCoordinates = [coordinate for coordinate in self.heightGrid.keys()
-                                if self.heightGrid[coordinate].getIsLowPoint()]
-        
-        for coordinate in lowPointCoordinates:
-            # get all it's neighbours
-            neighbours = [coordinate.getOffset(0, -1), coordinate.getOffset(0, 1), # left and right neighbours
-                          coordinate.getOffset(-1, 0), coordinate.getOffset(+1, 0), # top and bottom neighbours
-                          coordinate.getOffset(-1, -1), coordinate.getOffset(-1, +1), # top diagonal neighbours
-                          coordinate.getOffset(1, -1), coordinate.getOffset(1, 1)] # bottom diagonal neighbours
-            
-            validNeighbours = [neighbour for neighbour in neighbours
-                                if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT]
-            
-            # these belong to the basin of this low point
-            basinNeighbours = [neighbour for neighbour in validNeighbours
-                                if self.getHeightForCoordinate(neighbour) != 9]
-            
-            for bn in basinNeighbours:
-                self.heightGrid[coordinate].addToBasin(bn, self.heightGrid[bn])
-            
-            for bn in basinNeighbours:
-                # get all it's neighbours
-                neighbours = [bn.getOffset(0, -1), bn.getOffset(0, 1), # left and right neighbours
-                            bn.getOffset(-1, 0), bn.getOffset(+1, 0), # top and bottom neighbours
-                            bn.getOffset(-1, -1), bn.getOffset(-1, +1), # top diagonal neighbours
-                            bn.getOffset(1, -1), bn.getOffset(1, 1)] # bottom diagonal neighbours
-                
-                validNeighbours = [neighbour for neighbour in neighbours
-                                    if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT]
-                
-                # these belong to the basin of this low point
-                bns = [neighbour for neighbour in validNeighbours
-                                    if self.getHeightForCoordinate(neighbour) != 9]
-                
-                for n in basinNeighbours:
-                    self.heightGrid[coordinate].addToBasin(n, self.heightGrid[n])
-            
-
-    def updateLowPointCoordinateBasin(self, lowPoint, coordinate):
-        self.heightGrid[lowPoint].addToBasin(self.getHeightForCoordinate(coordinate))
-    
-    def populateLowPointBasins(self):
-        lowPointCoordinates = [coordinate for coordinate in self.heightGrid.keys()
-                                if self.heightGrid[coordinate].getIsLowPoint()]
-        
-        validCoordinates = [coordinate for coordinate in self.heightGrid.keys() 
-                            if self.getHeightForCoordinate(coordinate) != INVALID_HEIGHT]
-        
-        basinCoordinates = [coordinate for coordinate in validCoordinates
-                            if self.getHeightForCoordinate(coordinate) != 9]
-
-        for coordinate in basinCoordinates:
-            # get the distance of this coordinate with all the low points
-            distCoords = ([((coordinate.getDistance(lpCoordinate)), lpCoordinate) for lpCoordinate in lowPointCoordinates])
-
-            # get the low point that has the least distance with this coordinate
-            minDistCoord = min(distCoords, key = lambda t: t[0])
-
-            # add this coordinate to this low point's basin
-            self.updateLowPointCoordinateBasin(minDistCoord[1], coordinate)
-    
     def getLowPoints(self):
         lowPoints = [self.heightGrid[coordinate] for coordinate in self.heightGrid
                         if self.heightGrid[coordinate].getIsLowPoint()]
         
         return lowPoints
-        
+    
+    def getNeighboursForCoordinate(self, coordinate):
+        neighbours = [coordinate.getOffset(0, -1), coordinate.getOffset(0, 1), # left and right neighbours
+                      coordinate.getOffset(-1, 0), coordinate.getOffset(+1, 0)] # top and bottom neighbours
+
+        validNeighbours = [neighbour for neighbour in neighbours
+                            if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT
+                                and self.heightGrid[neighbour].getHeight() != 9]
+
+        return validNeighbours
+    
+    def setColourForCoordinate(self, coordinate, colour):
+        self.heightGrid[coordinate].setColour(colour)
+
+    def colourGrid(self):
+        validCoordinates = [coordinate for coordinate in self.heightGrid.keys()
+                            if self.heightGrid[coordinate].getHeight() != INVALID_HEIGHT
+                            and self.heightGrid[coordinate].getHeight() != MAX_HEIGHT]
+        colour = 1
+        Q = queue.Queue()
+
+        for coordinate in validCoordinates:
+            
+            if self.heightGrid[coordinate].isColourSet():
+                continue
+
+            Q.put(coordinate)
+
+            # colour this coordinate
+            self.setColourForCoordinate(coordinate, colour)
+
+            while not Q.empty():
+                v = Q.get()
+
+                validNeighbours = self.getNeighboursForCoordinate(v)
+
+                for neighbour in validNeighbours:
+                    if not self.heightGrid[neighbour].isColourSet():
+                        # if this neighbour is not coloured, add it to the queue
+                        Q.put(neighbour)
+
+                        # colour this neighbour
+                        self.setColourForCoordinate(neighbour, colour)
+                
+            colour += 1
+
+def getOrderedBasinSizes(heightGrid):
+    heights = [heightGrid[coordinate] for coordinate in heightGrid.keys()
+                if heightGrid[coordinate].getHeight() != INVALID_HEIGHT
+                and heightGrid[coordinate].getHeight() != MAX_HEIGHT]
+
+    colourCounts = [height.colour for height in heights]
+
+    colourDict = Counter(colourCounts)
+    sortedColours = dict(sorted(colourDict.items(), key=lambda item: item[1], reverse=True))
+    return sortedColours
+
+def getFinalResult(sortedColours):
+    basinSizes = list(sortedColours.values())
+    return (basinSizes[0] * basinSizes[1] * basinSizes[2])
+
 def main():
     rawHeights = getRawHeights(HEIGHTS)
+
+    # PART 1
     heightGrid = HeightGrid(rawHeights)
     heightGrid.markLowPoints()
     riskLevel = heightGrid.getRiskLevel()
     print("Risk Level = {}".format(riskLevel))
+
+    # PART 2
+    heightGrid = HeightGrid(rawHeights)
+    heightGrid.colourGrid()
+    sortedColours = getOrderedBasinSizes(heightGrid.getHeightGrid())
+    result = getFinalResult(sortedColours)
+    print("Final Result = {}".format(result))
 
 if __name__ == "__main__":
     main()
