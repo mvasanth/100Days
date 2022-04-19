@@ -9,7 +9,6 @@ from collections import Counter
 from utilities.Coordinate import Coordinate
 
 HEIGHTS: Final = "/workspaces/advent2021/src/inputs/day9.txt"
-INVALID_HEIGHT: Final = -1
 MAX_HEIGHT: Final = 9
 
 def getRawHeights(file):
@@ -64,33 +63,22 @@ class Height():
 
 class HeightGrid():
     def __init__(self, rawHeights):
-        self.rawHeights = rawHeights
-        self.heightGrid = self.buildHeightGrid()
+        self.heightGrid = self.buildHeightGrid(rawHeights)
     
-    def buildHeightGrid(self):
+    def buildHeightGrid(self, rawHeights):
         heightGrid = {}
 
-        # For ease of finding neighbours of a given coordinate in the grid, we will also populate
-        # the edges outside the given set of coordinates i.e, row: -1 and row: max + 1 and
-        # column: -1 and column: max + 1. 
+        rows = len(rawHeights)
+        columns = len(rawHeights[0])
 
-        rows = len(self.rawHeights)
-        columns = len(self.rawHeights[0])
-
-        for row in range(-1, rows + 1):
+        for row in range(rows):
             # get the list of energy levels associated with this row
-            if not (row == -1 or row == rows):
-                heightList = list(self.rawHeights[row])
+            heightList = list(rawHeights[row])
 
-            for column in range(-1, columns + 1):
+            for column in range(columns):
                 coordinate = Coordinate(row, column)
-
-                if row == -1 or row == rows or column == -1 or column == columns:
-                    height = Height(INVALID_HEIGHT)
-                    heightGrid[coordinate] = height
-                else:
-                    height = Height(int(heightList[column]))
-                    heightGrid[coordinate] = height
+                height = Height(int(heightList[column]))
+                heightGrid[coordinate] = height
         
         return heightGrid
 
@@ -100,28 +88,16 @@ class HeightGrid():
     def getHeightForCoordinate(self, coordinate):
         return self.heightGrid[coordinate].getHeight()
     
-    def setLowPointForCoordinate(self, coordinate, isLowPoint):
-        self.heightGrid[coordinate].setIsLowPoint(isLowPoint)
-    
     def markLowPoint(self, coordinate):
-        if self.getHeightForCoordinate(coordinate) == INVALID_HEIGHT:
-            return 
-        
-        # get all it's neighbours, this is a list of coordinates
-        neighbours = [coordinate.getOffset(0, -1), coordinate.getOffset(0, 1), # left and right neighbours
-                      coordinate.getOffset(-1, 0), coordinate.getOffset(+1, 0)] # top and bottom neighbours
-
-        # filter out the invalid neighbours    
-        validNeighbours = [neighbour for neighbour in neighbours
-                            if self.getHeightForCoordinate(neighbour) != INVALID_HEIGHT]
+        neighbours = self.getNeighbours(coordinate)
         
         # get the height of this coordinate
         height = self.getHeightForCoordinate(coordinate)
 
-        # check if it's height is lower than all it's neighbours
+        # check if its height is lower than all its neighbours
         if all(height < self.getHeightForCoordinate(neighbour) 
-                for neighbour in validNeighbours):
-            self.setLowPointForCoordinate(coordinate, True)
+                for neighbour in neighbours):
+            self.heightGrid[coordinate].setIsLowPoint(True)
 
     def markLowPoints(self):
         for coordinate in self.heightGrid:
@@ -133,66 +109,63 @@ class HeightGrid():
 
         return riskLevel
     
-    def getLowPoints(self):
-        lowPoints = [self.heightGrid[coordinate] for coordinate in self.heightGrid
-                        if self.heightGrid[coordinate].getIsLowPoint()]
-        
-        return lowPoints
-    
-    def getNeighboursForCoordinate(self, coordinate):
-        neighbours = [coordinate.getOffset(0, -1), coordinate.getOffset(0, 1), # left and right neighbours
-                      coordinate.getOffset(-1, 0), coordinate.getOffset(+1, 0)] # top and bottom neighbours
+    def getNeighbours(self, coordinate):
+        potentialNeighbours = [
+            coordinate.getOffset(0, -1),
+            coordinate.getOffset(0, 1), # left and right neighbours
+            coordinate.getOffset(-1, 0),
+            coordinate.getOffset(+1, 0)] # top and bottom neighbours
 
-        validNeighbours = [neighbour for neighbour in neighbours
-                            if self.heightGrid[neighbour].getHeight() != INVALID_HEIGHT
-                                and self.heightGrid[neighbour].getHeight() != 9]
-
+        validNeighbours = [neighbour for neighbour in potentialNeighbours
+                            if neighbour in self.heightGrid]
+                            
         return validNeighbours
-    
+
+    def getBasinNeighbours(self, coordinate):
+        basinNeighbours = [neighbour for neighbour in self.getNeighbours(coordinate)
+                            if self.heightGrid[neighbour].getHeight() != MAX_HEIGHT]
+
+        return basinNeighbours
+
     def setColourForCoordinate(self, coordinate, colour):
         self.heightGrid[coordinate].setColour(colour)
 
     def colourGrid(self):
-        validCoordinates = [coordinate for coordinate in self.heightGrid.keys()
-                            if self.heightGrid[coordinate].getHeight() != INVALID_HEIGHT
-                            and self.heightGrid[coordinate].getHeight() != MAX_HEIGHT]
+        colourableCoordinates = [coordinate for coordinate in self.heightGrid.keys()
+                            if self.heightGrid[coordinate].getHeight() != MAX_HEIGHT]
         colour = 1
         Q = queue.Queue()
 
-        for coordinate in validCoordinates:
+        for coordinate in colourableCoordinates:
             
             if self.heightGrid[coordinate].isColourSet():
                 continue
 
             Q.put(coordinate)
 
-            # colour this coordinate
-            self.setColourForCoordinate(coordinate, colour)
-
             while not Q.empty():
-                v = Q.get()
+                u = Q.get()
 
-                validNeighbours = self.getNeighboursForCoordinate(v)
+                # colour this coordinate
+                self.setColourForCoordinate(u, colour)
 
-                for neighbour in validNeighbours:
-                    if not self.heightGrid[neighbour].isColourSet():
+                basinNeighbours = self.getBasinNeighbours(u)
+
+                for v in basinNeighbours:
+                    if not self.heightGrid[v].isColourSet():
                         # if this neighbour is not coloured, add it to the queue
-                        Q.put(neighbour)
-
-                        # colour this neighbour
-                        self.setColourForCoordinate(neighbour, colour)
+                        Q.put(v)
                 
             colour += 1
 
 def getOrderedBasinSizes(heightGrid):
     heights = [heightGrid[coordinate] for coordinate in heightGrid.keys()
-                if heightGrid[coordinate].getHeight() != INVALID_HEIGHT
-                and heightGrid[coordinate].getHeight() != MAX_HEIGHT]
+                if heightGrid[coordinate].getHeight() != MAX_HEIGHT]
 
-    colourCounts = [height.colour for height in heights]
+    colours = [height.colour for height in heights]
 
-    colourDict = Counter(colourCounts)
-    sortedColours = dict(sorted(colourDict.items(), key=lambda item: item[1], reverse=True))
+    colourCounts = Counter(colours)
+    sortedColours = dict(sorted(colourCounts.items(), key=lambda item: item[1], reverse=True))
     return sortedColours
 
 def getFinalResult(sortedColours):
