@@ -5,15 +5,15 @@ https://adventofcode.com/2021/day/6
 """
 from typing import Final
 
-NEW_LANTERNFISH_TIMER: Final = 8
+MAX_LANTERNFISH_TIMER: Final = 8
 LANTERNFISH_TIMER_RESET: Final = 6
-LANTERNFISH_TIMER_EXPIRY: Final = 0
+LANTERNFISH_TIMER_EXPIRED: Final = 0
 TIMER_FILE = "/workspaces/advent2021/src/inputs/day6.txt"
 
 def getLanternfishTimers(file):
     """
     Given a string with comma separated list of integers representing timer values, returns a list of integers
-    where each integer corresponds to the timer value of a lantern fish.
+    where each integer corresponds to the timer value of a lanternfish.
     """
     try:
         inFile = open(file, 'r')
@@ -31,94 +31,58 @@ def getLanternfishTimers(file):
 
     return timers
 
-class Lanternfish:
-    def __init__(self, timer):
-        self.timer = timer
-        self.isNewTimer = False
-    
-    def getTimer(self):
-        return self.timer
-    
-    def getIsNewTimer(self):
-        return self.isNewTimer
-    
-    def resetTimer(self, newTimer):
-        self.timer = newTimer
-    
-    def setIsNewTimer(self, timerState):
-        self.isNewTimer = timerState
-    
-    def decrementTimer(self):
-        self.timer -= 1
-
-class LanternfishGrowth:
+def getFishCountList(timers):
     """
-    Models the growth of lanternfish over a certain number of days.
-    Inputs are a list of lanternfish objects and an integer representing the number of days.
-    """
-    def __init__(self, lanternfish, days):
-        self.lanternfishes = lanternfish
-        self.days = days
+    Input: A list of integers representing the timer values of each lanternfish. 
     
-    def handleTimerExpiry(self):
-        pass
-
-    def simulateLanternfishGrowth(self):
-        """
-        Given a list of lanternfish and the number of days, returns the growth (the number of fish) 
-        of the fish at the end of the stipulated time period.
-        """
-        count = 0
-
-        while (count != self.days):
-            numLanternfish = len(self.lanternfishes)
-            i = 0
-
-            while i < numLanternfish:
-                if self.lanternfishes[i].getTimer() == LANTERNFISH_TIMER_EXPIRY:
-                    # Reset the timer for this lanternfish
-                    self.lanternfishes[i].resetTimer(LANTERNFISH_TIMER_RESET)
-
-                    # Start the timer for a new lanternfish
-                    babyLanternfish = Lanternfish(NEW_LANTERNFISH_TIMER)
-                    babyLanternfish.setIsNewTimer(True)
-                    self.lanternfishes.append(babyLanternfish)
-
-                elif self.lanternfishes[i].getTimer() == NEW_LANTERNFISH_TIMER:
-                    # Fish was just added to the list, timer starts running from the next day
-                    if self.lanternfishes[i].getIsNewTimer() == True:
-                        pass
-                    else:
-                        self.lanternfishes[i].decrementTimer()
-                        
-                else:
-                    self.lanternfishes[i].decrementTimer()
-                
-                i += 1
-
-            for i in range(numLanternfish, len(self.lanternfishes)):
-                self.lanternfishes[i].setIsNewTimer(False)
-            
-            print(count)
-            count += 1
-
-        return len(self.lanternfishes)
-
-def getLanternfishes(timers):
-    lanternfishes = []
+    Output: An array of integers, where the index of the array is the timer value, and the value
+            at the index is the number of fish that are at that timer value.
+    """
+    fishCount = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     for timer in timers:
-        lanternfish = Lanternfish(timer)
-        lanternfishes.append(lanternfish)
+        fishCount[timer] += 1
     
-    return lanternfishes
+    return fishCount
+
+def simulateDay(fishCount):
+    """
+    The following things happen on each day:
+    - All fish have their timer value decremented by 1.
+    - The fish that have a timer value of 0, reset its timer value to 6. 
+    - In addition, they each create a new lanternfish and set its timer to 8.
+    - The new lanternfish start their timer countdown from the next day.
+    """
+    updatedFishCount = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    numTimerExpiredFish = fishCount[LANTERNFISH_TIMER_EXPIRED]
+
+    for i in range(MAX_LANTERNFISH_TIMER):
+        updatedFishCount[i] = fishCount[i + 1]
+    
+    if numTimerExpiredFish > 0:
+        updatedFishCount[LANTERNFISH_TIMER_RESET] += numTimerExpiredFish
+        updatedFishCount[MAX_LANTERNFISH_TIMER] += numTimerExpiredFish
+    
+    return updatedFishCount
+
+def simulateDays(fishCount, days):
+    for _ in range(days):
+        fishCount = simulateDay(fishCount)
+    
+    return fishCount
 
 def main():
     timers = getLanternfishTimers(TIMER_FILE)
-    lanternfishes = getLanternfishes(timers)
-    growth = LanternfishGrowth(lanternfishes, 256)
-    count = growth.simulateLanternfishGrowth()
-    print("Numer of lanternfish at the end of 256 days is {}".format(count))
+    
+    # PART 1: How many fish after 80 days?
+    fishCount = getFishCountList(timers)
+    fishCount = simulateDays(fishCount, 80)
+    print("Numer of lanternfish at the end of 80 days is {}".format(sum(fishCount)))
+
+    # PART 2: How many fish after 256 days?
+    fishCount = getFishCountList(timers)
+    fishCount = simulateDays(fishCount, 256)
+    print("Numer of lanternfish at the end of 256 days is {}".format(sum(fishCount)))
 
 if __name__ == "__main__":
     main()

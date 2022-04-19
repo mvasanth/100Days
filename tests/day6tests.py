@@ -3,14 +3,23 @@ import sys
 sys.path.insert(1, '/workspaces/advent2021/src')
 import day6
 
-class testCommand(unittest.TestCase):
+class testDay6(unittest.TestCase):
     def testSimulateLanternfishGrowth(self):
         timers = [3,4,3,1,2]
-        lanternfishes = day6.getLanternfishes(timers)
-        growth = day6.LanternfishGrowth(lanternfishes, 256)
-        count = growth.simulateLanternfishGrowth()
-        #self.assertEqual(26984457539, count)
-        self.assertEqual(5934, count)
+        # check after 18 days
+        fishCount = day6.getFishCountList(timers)
+        fishCount = day6.simulateDays(fishCount, 18)
+        self.assertEqual(26, sum(fishCount))
+        
+        # check after 80 days
+        fishCount = day6.getFishCountList(timers)
+        fishCount = day6.simulateDays(fishCount, 80)
+        self.assertEqual(5934, sum(fishCount))
+        
+        # check after 256 days
+        fishCount = day6.getFishCountList(timers)
+        fishCount = day6.simulateDays(fishCount, 256)
+        self.assertEqual(26984457539, sum(fishCount))
 
 if __name__ == '__main__':
     unittest.main()
