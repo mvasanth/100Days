@@ -5,9 +5,7 @@ https://adventofcode.com/2021/day/6
 """
 from typing import Final
 
-MAX_LANTERNFISH_TIMER: Final = 8
 LANTERNFISH_TIMER_RESET: Final = 6
-LANTERNFISH_TIMER_EXPIRED: Final = 0
 TIMER_FILE = "/workspaces/advent2021/src/inputs/day6.txt"
 
 def getLanternfishTimers(file):
@@ -53,15 +51,8 @@ def simulateDay(fishCount):
     - In addition, they each create a new lanternfish and set its timer to 8.
     - The new lanternfish start their timer countdown from the next day.
     """
-    updatedFishCount = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    numTimerExpiredFish = fishCount[LANTERNFISH_TIMER_EXPIRED]
-
-    for i in range(MAX_LANTERNFISH_TIMER):
-        updatedFishCount[i] = fishCount[i + 1]
-    
-    if numTimerExpiredFish > 0:
-        updatedFishCount[LANTERNFISH_TIMER_RESET] += numTimerExpiredFish
-        updatedFishCount[MAX_LANTERNFISH_TIMER] += numTimerExpiredFish
+    updatedFishCount = fishCount[1:] + [ fishCount[0] ]
+    updatedFishCount[LANTERNFISH_TIMER_RESET] += fishCount[0]
     
     return updatedFishCount
 
@@ -77,12 +68,12 @@ def main():
     # PART 1: How many fish after 80 days?
     fishCount = getFishCountList(timers)
     fishCount = simulateDays(fishCount, 80)
-    print("Numer of lanternfish at the end of 80 days is {}".format(sum(fishCount)))
+    print("Number of lanternfish at the end of 80 days is {}".format(sum(fishCount)))
 
     # PART 2: How many fish after 256 days?
     fishCount = getFishCountList(timers)
     fishCount = simulateDays(fishCount, 256)
-    print("Numer of lanternfish at the end of 256 days is {}".format(sum(fishCount)))
+    print("Number of lanternfish at the end of 256 days is {}".format(sum(fishCount)))
 
 if __name__ == "__main__":
     main()
