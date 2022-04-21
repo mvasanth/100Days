@@ -1,5 +1,3 @@
-from cmath import sqrt
-
 class Coordinate:
     """
     Models a single coordinate.
@@ -16,25 +14,24 @@ class Coordinate:
     
     def getOffset(self, row, column):
         return Coordinate(self.x + row, self.y + column)
+
+    def __add__(self, other):
+        if not isinstance(other, Coordinate):
+            return NotImplemented
+
+        return Coordinate(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        if not isinstance(other, Coordinate):
+            return NotImplemented
+
+        return Coordinate(self.x - other.x, self.y - other.y)
     
     def __eq__(self, other):
         if not isinstance(other, Coordinate):
-            # don't attempt to compare against unrelated types
-            return NotImplemented
+            return False
         
         return self.x == other.getX() and self.y == other.getY()
     
     def __hash__(self):
         return hash((self.x, self.y))
-    
-    def __sub__(self, other):
-        return (abs(self.x - other.x) + abs(self.y - other.y))
-    
-    def getDistance(self, other):
-        if self.x == other.x:
-            return abs(other.y - self.y)
-        elif self.y == other.y:
-            return abs(other.x - self.x)
-        else:
-            dist = sqrt((other.x - self.x)**2 + (other.y - self.y)**2)
-            return dist.real
