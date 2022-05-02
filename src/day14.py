@@ -3,7 +3,6 @@ Implementatin of Day 14 of Advent of Code 2021.
 More details of the challenge can be found here:
 https://adventofcode.com/2021/day/14
 """
-from re import template
 from typing import Final
 from collections import Counter
 
@@ -44,13 +43,49 @@ def getRuleDict(rules):
     
     return ruleDict
 
-def applySteps(template, ruleDict, numSteps):
-    for _ in range(numSteps):
-        template = applyStep(template, ruleDict)
-    
-    return template
+def getTemplateDict(template):
+    templateDict = {}
 
-def applyStep(template, ruleDict):
+    for i in range(len(template) - 1):
+        pair = template[i: i + 2]
+
+        if pair not in templateDict:
+            templateDict[pair] = 1
+        else:
+            templateDict[pair] += 1
+    
+    return templateDict
+
+def getLetterDict(template):
+    letterDict = {}
+
+    for letter in template:
+        updateLetterDict(letterDict, letter)
+    
+    return letterDict
+
+def updateLetterDict(letterDict, letter):
+    if letter not in letterDict:
+        letterDict[letter] = 1
+    else:
+        letterDict[letter] += 1
+
+def applySteps(template, ruleDict, numSteps):
+    letterDict = getLetterDict(template)
+    templateDict = getTemplateDict(template)
+
+    for _ in range(numSteps):
+        (letterDict, templateDict) = applyStep(letterDict, templateDict, ruleDict)
+    
+    return (letterDict, templateDict)
+
+def updatePair(pair, templateDict, count):
+    if pair not in templateDict:
+        templateDict[pair] = count
+    else:
+        templateDict[pair] += count
+    
+def applyStep(letterDict, templateDict, ruleDict):
     """
     Models a single step in the polymer reaction.
     
@@ -58,19 +93,28 @@ def applyStep(template, ruleDict):
     
     Output: the modified polymer template (string) after the polymer reactions have been applied.
     """
-    tempList = list(template)
-    index = 1
+    templateDictCopy = templateDict.copy()
 
-    for i in range(len(template) - 1):
-        pair = template[i: i + 2]
+    for pair in templateDict:
+        count = templateDict[pair]
 
+        # get the character that is inserted and the new pairs
         insertP = ruleDict[pair]
+        leftPair = pair[0] + insertP
+        rightPair = insertP + pair[1]
 
-        tempList.insert(index, insertP)
-        index += 2
+        # update the newly inserted character in the letter dictionary
+        updateLetterDict(letterDict, insertP)
+
+        # the old pair is broken, update it's count
+        templateDictCopy[pair] -= count
+
+        # new pairs are added to the dictionary
+        updatePair(leftPair, templateDictCopy, count)
+        updatePair(rightPair, templateDictCopy, count)
+
+    return (letterDict, templateDictCopy)
     
-    return "".join(tempList)
-
 def getPartOneResult(template):
     counts = Counter(template)
     mostCommonElementCount = max(counts.values())
