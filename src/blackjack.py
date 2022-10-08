@@ -28,8 +28,6 @@ import random
 import os
 from art import blackjack_logo
 
-cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-clear = lambda: os.system('clear')
 #Hint 2: Read this breakdown of program requirements: 
 #   http://listmoz.com/view/6h34DJpvJBFVRlZfJvxF
 #Then try to create your own flowchart for the program.
@@ -41,7 +39,8 @@ clear = lambda: os.system('clear')
 #11 is the Ace.
 #cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
 def deal_card():
-  return random.choice(cards)
+    cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+    return random.choice(cards)
 
 #Hint 5: Deal the user and computer 2 cards each using deal_card() and append().
 #user_cards = []
@@ -63,19 +62,16 @@ def calculate_score(hand):
     score = sum(hand)
 
     if len(hand) == 2 and score == 21:
-        if hand[0] == 10 or hand[1] == 10:
             # this is a blackjack hand
             return 0
     
-    if score > 21:
-        if 11 in hand:
-            # score has exceeded 21, there is an ace present in the hand.
-            # use 0 as the value of the ace, i.e, replace 11 with 1
-            hand.remove(11)
-            hand.append(1)
-            score = sum(hand)
+    if score > 21 and 11 in hand:
+        # score has exceeded 21, there is an ace present in the hand.
+        # use 0 as the value of the ace, i.e, replace 11 with 1
+        hand.remove(11)
+        hand.append(1)
     
-    return score
+    return sum(hand)
 
 #Hint 13: Create a function called compare() and pass in the user_score and computer_score. 
 # If the computer and user both have the same score, then it's a draw. 
@@ -131,13 +127,11 @@ def blackjack():
             user_score = calculate_score(user_cards)
 
         elif next_card == 'n':
-            while computer_score < 17:
+            while computer_score < 17 and computer_score != 0:
                 card = deal_card()
                 computer_cards.append(card)
                 computer_score = calculate_score(computer_cards)
             
-            print(f"Computer's cards {computer_cards}")
-
     print(f"\tYour final hand: {user_cards}, final score {user_score}.")
     print(f"\tComputer's final hand: {computer_cards}, final score {computer_score}.")
     compare(user_score, computer_score)
@@ -146,6 +140,7 @@ def blackjack():
 # new game of blackjack and show the logo from art.py.
 def main_loop():
   done = False
+  clear = lambda: os.system('clear')
   
   while not done:
     game_input = input("Do you want to play a game of Blackjack? Type 'y' or 'n': ")
