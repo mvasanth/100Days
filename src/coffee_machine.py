@@ -110,23 +110,21 @@ def main():
 
         if choice == "report":
             print(format_report(resources))
-            break
         elif choice == "off":
             is_machine_off = True
-            break
-
-        make_coffee = can_we_make_coffee(choice)
-        if make_coffee[1]:
-            total = process_coins()
-            enough_money = is_transaction_possible(total, choice)
-            if enough_money[1]:
-                update_resources(choice)
-                change = update_money(total, choice)
-                print("Here is ${:.2f} in change.".format(change))
-                print(f"Here is your {choice}. Enjoy!")
-            else:
-                print(enough_money[0])
         else:
-            print(make_coffee[0])
+            make_coffee = can_we_make_coffee(choice)
+            if make_coffee[1]:
+                total = process_coins()
+                enough_money = is_transaction_possible(total, choice)
+                if enough_money[1]:
+                    update_resources(choice)
+                    change = update_money(total, choice)
+                    print("Here is ${:.2f} in change.".format(change))
+                    print(f"Here is your {choice}. Enjoy!")
+                else:
+                    print(enough_money[0])
+            else:
+                print(make_coffee[0])
 
 main()
