@@ -1,5 +1,4 @@
-from random import randint, random
-from secrets import choice
+from random import randint, choice
 from turtle import Turtle, Screen, colormode
 from turtle import Turtle
 
