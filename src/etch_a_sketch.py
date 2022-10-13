@@ -32,11 +32,9 @@ def move_down():
 
 def move_right():
     timmy.setheading(timmy.heading() - 10)
-    move_forward()
 
 def move_left():
     timmy.setheading(timmy.heading() + 10)
-    move_forward()
 
 def etch_a_sketch():
 
