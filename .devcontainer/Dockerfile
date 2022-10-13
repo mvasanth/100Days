@@ -4,7 +4,7 @@ FROM debian:bullseye-slim as dev-env
 RUN apt-get update \
     #
     # install the things we want
-    && apt-get install -y sudo git python3 python3-tk wget curl\
+    && apt-get install -y sudo git python3 python3-tk wget curl x11-xserver-utils \
     #
     # clean up apt-get files
     && apt-get clean  \

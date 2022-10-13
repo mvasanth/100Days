@@ -18,3 +18,5 @@ def main():
     print(f"Your final score is {quiz_brain.get_score()}/{quiz_brain.get_question_number()}.")
 
 main()
+
+print("hello")
