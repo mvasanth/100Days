@@ -1,4 +1,16 @@
 from turtle import Turtle, Screen
+"""
+Implement the game etch a sketch, where the user can draw with the keyboard. Use the following keys
+w to move forward,
+s to move backward,
+d to move in a clockwise direction
+a to move in the counter clockwise direction
+up arrow to move up
+down arrow to move down
+left arrow to turn left
+right arrow to turn right, and 
+c to clear the screen.
+"""
 timmy = Turtle()
 my_screen = Screen()
 
