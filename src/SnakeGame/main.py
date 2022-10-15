@@ -33,17 +33,14 @@ while is_game_on:
         snake.grow_snake()
         food.refresh()
         scoreboard.increment_score()
-        print(len(snake.segments))
     
     # Detect collision with the wall
     if snake.is_colliding_with_wall():
-        print("Wall collision")
         scoreboard.game_over()
         is_game_on = False
     
     # Detect collision with it's own body
     if snake.is_colliding_with_body():
-        print("Collison code")
         scoreboard.game_over()
         is_game_on = False
     
