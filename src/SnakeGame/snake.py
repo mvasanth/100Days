@@ -1,3 +1,4 @@
+from re import T
 from turtle import Turtle
 
 class Snake:
@@ -8,38 +9,36 @@ class Snake:
     MOVE_DISTANCE = 20
 
     def __init__(self):
-        self.snake = self.build_snake()
-        self.snake_len = len(self.snake)
+        self.segments = []
+        self.build_snake()
         
+    def build_snake_segment(self, pos):
+        segment = Turtle("square")
+        segment.color("white")
+        segment.penup()
+        segment.goto(pos)
+        segment.speed(2)
+        self.segments.append(segment)
+    
     def build_snake(self):
-        segments = []
         start_pos = [(0, 0), (-20, 0), (-40, 0)]
 
         for pos in start_pos:
-            segment = Turtle("square")
-            segment.color("white")
-            segment.penup()
-            segment.goto(pos)
-            segments.append(segment)
+            self.build_snake_segment(pos)
         
-        return segments
-
     def get_snake(self):
-        return self.snake
+        return self.segments
     
     def get_snake_head(self):
         return self.get_snake()[0]
     
-    def get_snake_len(self):
-        return self.snake_len
-    
     def move(self):
-        for seg_num in range(self.snake_len - 1, 0, -1):
-            prev_seg_x = self.snake[seg_num - 1].xcor()
-            prev_seg_y = self.snake[seg_num - 1].ycor()
-            self.snake[seg_num].goto(prev_seg_x, prev_seg_y)
+        for seg_num in range(len(self.segments) - 1, 0, -1):
+            prev_seg_x = self.segments[seg_num - 1].xcor()
+            prev_seg_y = self.segments[seg_num - 1].ycor()
+            self.segments[seg_num].goto(prev_seg_x, prev_seg_y)
         
-        self.snake[0].forward(self.MOVE_DISTANCE)
+        self.get_snake_head().forward(self.MOVE_DISTANCE)
     
     def move_up(self):
         if self.get_snake_head().heading() != self.DOWN:
@@ -56,3 +55,23 @@ class Snake:
     def move_right(self):
         if self.get_snake_head().heading() != self.LEFT:
             self.get_snake_head().setheading(self.RIGHT)
+        
+    def grow_snake(self):
+        last_seg_pos = self.segments[-1].position()
+        self.build_snake_segment(last_seg_pos)
+    
+    def is_colliding_with_wall(self):
+        if self.get_snake_head().xcor() > 290 or \
+            self.get_snake_head().xcor() < -290 or \
+            self.get_snake_head().ycor() > 290 or \
+            self.get_snake_head().ycor() < -290:
+            return True
+        
+        return False
+    
+    def is_colliding_with_body(self):
+        for segment in self.segments[1:]:
+            if self.get_snake_head().distance(segment) < 10:
+                return True
+        
+        return False
