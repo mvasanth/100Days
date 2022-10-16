@@ -6,20 +6,14 @@ class Paddle:
     MOVE_DISTANCE = 20
     UP = 90
     DOWN = 270
-    START_X = 350
-    START_Y = 0
 
     def __init__(self, pos):
-        self.paddle = self.build_paddle(pos)
-    
-    def build_paddle(self, pos):
-        paddle_seg = Turtle("square")
-        paddle_seg.color("white")
-        paddle_seg.penup()
-        paddle_seg.setheading(self.UP)
-        paddle_seg.shapesize(stretch_wid=1, stretch_len=5, outline=None)
-        paddle_seg.goto(pos)
-        return paddle_seg
+        self.paddle = Turtle("square")
+        self.paddle.color("white")
+        self.paddle.penup()
+        self.paddle.setheading(self.UP)
+        self.paddle.shapesize(stretch_wid=1, stretch_len=5, outline=None)
+        self.paddle.goto(pos)
     
     def move(self):
         self.paddle.forward(self.MOVE_DISTANCE)
@@ -31,3 +25,6 @@ class Paddle:
     def move_down(self):
         self.paddle.setheading(self.DOWN)
         self.move()
+    
+    def get_paddle(self):
+        return self.paddle

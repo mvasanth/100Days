@@ -1,5 +1,7 @@
 from turtle import Screen
 from paddle import Paddle
+from ball import Ball
+import time
 
 window = Screen()
 window.title("Welcome to a game of Pong!")
@@ -20,16 +22,32 @@ window.tracer(0)
 #     net.penup()
 #     net.forward(30)
 
-user_paddle = Paddle((350, 0))
-comp_paddle = Paddle((-350, 0))
+l_paddle = Paddle((-350, 0))
+r_paddle = Paddle((350, 0))
+ball = Ball()
 
 window.listen()
-window.onkey(user_paddle.move_up, "Up")
-window.onkey(user_paddle.move_down, "Down")
+window.onkey(l_paddle.move_up, "w")
+window.onkey(l_paddle.move_down, "s")
+window.onkey(r_paddle.move_up, "Up")
+window.onkey(r_paddle.move_down, "Down")
+
+ball.move()
+window.update()
 
 is_game_on = True
 
 while is_game_on:
     window.update()
+    time.sleep(0.1)
+    ball.move()
+
+    # Detect collision with the wall
+    if ball.is_colliding_with_wall():
+        ball.bounce_y()
+    
+    # Detect collision with either of the paddles 
+    if ball.is_colliding_with_paddle(r_paddle) or ball.is_colliding_with_paddle(l_paddle):
+        ball.bounce_x()
 
 window.exitonclick()
