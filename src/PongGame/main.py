@@ -1,3 +1,4 @@
+from tkinter.tix import MAX
 from turtle import Screen
 from scoreboard import ScoreBoard
 from paddle import Paddle
@@ -63,9 +64,9 @@ def main():
             r_scoreboard.write_score(R_SCOREBOARD_POS)
         
         # Game ending logic
-        # if r_paddle.get_score() == MAX_SCORE \
-        #     or l_paddle.get_score == MAX_SCORE:
-        #     is_game_on = False
+        if l_scoreboard.get_score() == MAX_SCORE \
+            or r_scoreboard.get_score() == MAX_SCORE:
+            is_game_on = False
             
     window.exitonclick()
 
