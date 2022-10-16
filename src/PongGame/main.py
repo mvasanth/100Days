@@ -9,21 +9,10 @@ window.setup(width=800, height=600)
 window.bgcolor("black")
 window.tracer(0)
 
-# net = Turtle("square")
-# net.color("white")
-# net.penup()
-# net.goto(0, -300)
-# net.setheading(90)
-# net.pensize(10)
-
-# for i in range(20):
-#     net.pendown()
-#     net.forward(20)
-#     net.penup()
-#     net.forward(30)
-
 l_paddle = Paddle((-350, 0))
+l_paddle.show_score((-100, 200))
 r_paddle = Paddle((350, 0))
+r_paddle.show_score((100, 200))
 ball = Ball()
 
 window.listen()
@@ -39,7 +28,7 @@ is_game_on = True
 
 while is_game_on:
     window.update()
-    time.sleep(0.1)
+    time.sleep(ball.get_move_speed())
     ball.move()
 
     # Detect collision with the wall
@@ -47,7 +36,20 @@ while is_game_on:
         ball.bounce_y()
     
     # Detect collision with either of the paddles 
-    if ball.is_colliding_with_paddle(r_paddle) or ball.is_colliding_with_paddle(l_paddle):
-        ball.bounce_x()
-
+    if ball.distance(r_paddle) < 50 and ball.xcor() >= (r_paddle.xcor() - 20) \
+        or ball.distance(l_paddle) < 50 and ball.xcor() <= (l_paddle.xcor() + 20):
+            ball.bounce_x()
+    
+    # Right player has missed the ball
+    if ball.xcor() >= 380:
+        ball.reset_position()
+        l_paddle.increment_score()
+        l_paddle.show_score((-100, 200))
+    
+    # Left player has missed the ball
+    if ball.xcor() <= -380:
+        ball.reset_position()
+        r_paddle.increment_score()
+        r_paddle.show_score((100, 200))
+        
 window.exitonclick()

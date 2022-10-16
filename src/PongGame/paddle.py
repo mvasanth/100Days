@@ -1,6 +1,7 @@
 from turtle import Turtle
+from scoreboard import ScoreBoard
 
-class Paddle:
+class Paddle(Turtle):
     WIDTH = 20
     HEIGHT = 100
     MOVE_DISTANCE = 20
@@ -8,23 +9,28 @@ class Paddle:
     DOWN = 270
 
     def __init__(self, pos):
-        self.paddle = Turtle("square")
-        self.paddle.color("white")
-        self.paddle.penup()
-        self.paddle.setheading(self.UP)
-        self.paddle.shapesize(stretch_wid=1, stretch_len=5, outline=None)
-        self.paddle.goto(pos)
+        super().__init__()
+        self.color("white")
+        self.shape("square")
+        self.penup()
+        self.setheading(self.UP)
+        self.shapesize(stretch_wid=1, stretch_len=5, outline=None)
+        self.goto(pos)
+        self.scoreboard = ScoreBoard()
     
     def move(self):
-        self.paddle.forward(self.MOVE_DISTANCE)
+        self.forward(self.MOVE_DISTANCE)
     
     def move_up(self):
-        self.paddle.setheading(self.UP)
+        self.setheading(self.UP)
         self.move()
     
     def move_down(self):
-        self.paddle.setheading(self.DOWN)
+        self.setheading(self.DOWN)
         self.move()
     
-    def get_paddle(self):
-        return self.paddle
+    def show_score(self, pos):
+        self.scoreboard.write_score(pos)
+    
+    def increment_score(self):
+        self.scoreboard.increment_score()

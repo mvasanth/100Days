@@ -8,6 +8,7 @@ class Ball(Turtle):
         self.penup()
         self.x_move = 10
         self.y_move = 10
+        self.move_speed = 0.1
 
     def move(self):
         new_x = self.xcor() + self.x_move
@@ -21,8 +22,8 @@ class Ball(Turtle):
         return False
     
     def is_colliding_with_paddle(self, paddle):
-        # if self.distance(paddle) < 50 and self.xcor() >= paddle.xcor():
-        #     return True
+        if self.distance(paddle) < 50 and self.xcor() >= paddle.xcor():
+            return True
         
         return False
     
@@ -31,3 +32,15 @@ class Ball(Turtle):
 
     def bounce_x(self):
         self.x_move *= -1
+        self.move_speed *= 0.9
+    
+    def reset_move_speed(self):
+        self.move_speed = 0.1
+    
+    def reset_position(self):
+        self.home()
+        self.reset_move_speed()
+        self.bounce_x()
+    
+    def get_move_speed(self):
+        return self.move_speed
