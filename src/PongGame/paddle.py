@@ -16,7 +16,6 @@ class Paddle(Turtle):
         self.setheading(self.UP)
         self.shapesize(stretch_wid=1, stretch_len=5, outline=None)
         self.goto(pos)
-        self.scoreboard = ScoreBoard()
     
     def move(self):
         self.forward(self.MOVE_DISTANCE)
@@ -28,9 +27,3 @@ class Paddle(Turtle):
     def move_down(self):
         self.setheading(self.DOWN)
         self.move()
-    
-    def show_score(self, pos):
-        self.scoreboard.write_score(pos)
-    
-    def increment_score(self):
-        self.scoreboard.increment_score()

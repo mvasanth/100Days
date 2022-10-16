@@ -19,3 +19,11 @@ class ScoreBoard(Turtle):
         self.goto(pos)
         self.clear()
         self.write(arg=score_string, move=False, align=self.ALIGNMENT, font=self.FONT)
+    
+    def get_score(self):
+        return self.score
+    
+    def game_over(self):
+        self.home()
+        self.write(arg="GAME OVER.", move=False, align=self.ALIGNMENT, font=self.FONT)
+    
