@@ -18,7 +18,7 @@ class Player(Turtle):
         self.forward(self.MOVE_DISTANCE)
     
     def is_level_cleared(self):
-        if self.ycor() > 280:
+        if self.ycor() > self.FINISH_LINE_Y:
             return True
         
         return False

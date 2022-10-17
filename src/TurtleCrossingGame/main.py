@@ -4,52 +4,61 @@ from player import Player
 from car_manager import CarManager
 from scoreboard import Scoreboard
 
-MAX_LEVELS = 10
+def main():
+    MAX_LEVELS = 10
 
-screen = Screen()
-screen.setup(width=600, height=600)
-screen.tracer(0)
+    # A new car appears on the screen on every n-th iteration of the number below
+    CAR_APPEAR_RATE = 6 
 
-kurma = Player()
-car_manager = CarManager()
-scoreboard = Scoreboard()
+    # If the player is within this distance of the car, then they are considered to collide
+    COLLISION_DIST = 20
 
-screen.listen()
-screen.onkey(kurma.move, "Up")
+    screen = Screen()
+    screen.setup(width=600, height=600)
+    screen.tracer(0)
 
-is_game_on = True
-loop_var = 0
-scoreboard.write_level()
+    kurma = Player()
+    car_manager = CarManager()
+    scoreboard = Scoreboard()
 
-while is_game_on:
-    time.sleep(car_manager.move_speed)
-    screen.update()
+    screen.listen()
+    screen.onkey(kurma.move, "Up")
 
-    car_manager.keep_cars_moving()
+    is_game_on = True
+    car_appear_var = 0
+    scoreboard.write_level()
 
-    if loop_var % 20 == 0:
-        car_manager.add_new_car()
+    while is_game_on:
+        time.sleep(car_manager.move_speed)
+        screen.update()
 
-    loop_var += 1
+        car_manager.keep_cars_moving()
 
-    # The car manager only needs to keep track of all the cars that are presently on the screen.
-    car_manager.update_cars()
+        if car_appear_var % CAR_APPEAR_RATE == 0:
+            car_manager.add_new_car()
 
-    # Detect collision with any car
-    for car in car_manager.get_cars():
-        if kurma.distance(car) < 20:
-            scoreboard.game_over()
+        car_appear_var += 1
+
+        # The car manager only needs to keep track of all the cars that are presently on the screen.
+        car_manager.update_cars()
+
+        # Detect collision with any car
+        for car in car_manager.get_cars():
+            if kurma.distance(car) < COLLISION_DIST:
+                scoreboard.game_over()
+                is_game_on = False
+        
+        # Detect if the turtle has reached the end of the screen and up the level, and speed up the cars.
+        if kurma.is_level_cleared():
+            kurma.reset_player()
+            scoreboard.increment_level()
+            car_manager.increase_speed()
+        
+        if scoreboard.get_level() == MAX_LEVELS:
+            scoreboard.declare_winner()
             is_game_on = False
-    
-    # Detect if the turtle has reached the end of the screen and up the level, and speed up the cars.
-    if kurma.is_level_cleared():
-        kurma.reset_player()
-        scoreboard.increment_level()
-        car_manager.increase_speed()
-    
-    if scoreboard.get_level() == MAX_LEVELS:
-        scoreboard.declare_winner()
-        is_game_on = False
 
-screen.exitonclick()
+    screen.exitonclick()
+
+main()
     
