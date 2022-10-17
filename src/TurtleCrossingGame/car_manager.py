@@ -5,8 +5,26 @@ MOVE_INCREMENT = 10
 
 class CarManager:
     def __init__(self):
-        self.car = Car()
-        self.car.move()
+        self.cars = []
+    
+    def add_new_car(self):
+        car = Car()
+        self.cars.append(car)
+
+    def keep_cars_moving(self):
+        for car in self.cars:
+            car.move()
+    
+    def update_cars(self):
+        cars_copy = self.cars[:]
+
+        for car in cars_copy:
+            if car.xcor() < -300:
+                self.cars.remove(car)
+                car.hideturtle()
+    
+    def get_cars(self):
+        return self.cars
 
 class Car(Turtle):
 
