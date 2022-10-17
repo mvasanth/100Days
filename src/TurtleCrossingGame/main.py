@@ -4,6 +4,8 @@ from player import Player
 from car_manager import CarManager
 from scoreboard import Scoreboard
 
+MAX_LEVELS = 10
+
 screen = Screen()
 screen.setup(width=600, height=600)
 screen.tracer(0)
@@ -20,7 +22,7 @@ loop_var = 0
 scoreboard.write_level()
 
 while is_game_on:
-    time.sleep(0.1)
+    time.sleep(car_manager.move_speed)
     screen.update()
 
     car_manager.keep_cars_moving()
@@ -39,7 +41,15 @@ while is_game_on:
             scoreboard.game_over()
             is_game_on = False
     
-    # Detect if the turtle has reached the end of the screen 
+    # Detect if the turtle has reached the end of the screen and up the level, and speed up the cars.
+    if kurma.is_level_cleared():
+        kurma.reset_player()
+        scoreboard.increment_level()
+        car_manager.increase_speed()
+    
+    if scoreboard.get_level() == MAX_LEVELS:
+        scoreboard.declare_winner()
+        is_game_on = False
 
 screen.exitonclick()
     

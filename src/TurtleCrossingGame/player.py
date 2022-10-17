@@ -16,3 +16,12 @@ class Player(Turtle):
 
     def move(self):
         self.forward(self.MOVE_DISTANCE)
+    
+    def is_level_cleared(self):
+        if self.ycor() > 280:
+            return True
+        
+        return False
+    
+    def reset_player(self):
+        self.goto(self.STARTING_POSITION)

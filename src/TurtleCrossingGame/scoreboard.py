@@ -24,4 +24,10 @@ class Scoreboard(Turtle):
         self.goto(-50, 270)
         self.write(arg="GAME OVER.", move=False, align=self.ALIGNMENT, font=self.FONT)
     
-
+    def get_level(self):
+        return self.level
+    
+    def declare_winner(self):
+        self.goto(-50, -270)
+        self.write(arg="YOU WIN!!!", move=False, align=self.ALIGNMENT, font=self.FONT)
+    

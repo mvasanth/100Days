@@ -1,11 +1,14 @@
 from turtle import Turtle
 import random
 
-MOVE_INCREMENT = 10
-
 class CarManager:
+
+    LEFT_EDGE = -300
+    MOVE_INCREMENT = 0.5
+
     def __init__(self):
         self.cars = []
+        self.move_speed = 0.1
     
     def add_new_car(self):
         car = Car()
@@ -19,12 +22,15 @@ class CarManager:
         cars_copy = self.cars[:]
 
         for car in cars_copy:
-            if car.xcor() < -300:
+            if car.xcor() < self.LEFT_EDGE:
                 self.cars.remove(car)
                 car.hideturtle()
     
     def get_cars(self):
         return self.cars
+    
+    def increase_speed(self):
+        self.move_speed *= self.MOVE_INCREMENT
 
 class Car(Turtle):
 
