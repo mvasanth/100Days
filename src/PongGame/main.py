@@ -1,4 +1,3 @@
-from tkinter.tix import MAX
 from turtle import Screen
 from scoreboard import ScoreBoard
 from paddle import Paddle
@@ -7,8 +6,11 @@ import time
 
 def main():
     MAX_SCORE = 5
+    L_PADDLE_POS = (-350, 0)
+    R_PADDLE_POS = (350, 0)
     L_SCOREBOARD_POS = (-100, 200)
     R_SCOREBOARD_POS = (100, 200)
+    PADDLE_COLLISION_DIST = 50
     HOME = (0, 0)
 
     window = Screen()
@@ -17,11 +19,11 @@ def main():
     window.bgcolor("black")
     window.tracer(0)
 
-    l_paddle = Paddle((-350, 0))
+    l_paddle = Paddle(L_PADDLE_POS)
     l_scoreboard = ScoreBoard(L_SCOREBOARD_POS)
     l_scoreboard.write_score()
 
-    r_paddle = Paddle((350, 0))
+    r_paddle = Paddle(R_PADDLE_POS)
     r_scoreboard = ScoreBoard(R_SCOREBOARD_POS)
     r_scoreboard.write_score()
     
@@ -48,8 +50,8 @@ def main():
             ball.bounce_y()
         
         # Detect collision with either of the paddles 
-        if ball.distance(r_paddle) < 50 and ball.xcor() >= (r_paddle.xcor() - 20) \
-            or ball.distance(l_paddle) < 50 and ball.xcor() <= (l_paddle.xcor() + 20):
+        if ball.distance(r_paddle) < PADDLE_COLLISION_DIST and ball.xcor() >= (r_paddle.xcor() - 20) \
+            or ball.distance(l_paddle) < PADDLE_COLLISION_DIST and ball.xcor() <= (l_paddle.xcor() + 20):
                 ball.bounce_x()
         
         # Right player has missed the ball
